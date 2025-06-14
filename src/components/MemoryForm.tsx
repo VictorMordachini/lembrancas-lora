@@ -59,12 +59,31 @@ export const MemoryForm = ({ onSave, onCancel }: MemoryFormProps) => {
     return uploadedUrls;
   };
 
-  const createDumpImage = async (imageUrls: string[]) => {
-    if (imageUrls.length <= 1) return imageUrls[0] || null;
+  const createCollage = async (imageUrls: string[], memoryId: string, memoryTitle: string) => {
+    try {
+      console.log('Criando colagem para memória:', memoryId);
+      
+      const { data, error } = await supabase.functions.invoke('create-memory-collage', {
+        body: {
+          imageUrls,
+          memoryId,
+          title: memoryTitle
+        }
+      });
 
-    // Aqui você implementaria a lógica para criar uma colagem
-    // Por simplicidade, vamos retornar a primeira imagem
-    return imageUrls[0];
+      if (error) {
+        console.error('Erro ao criar colagem:', error);
+        // Se falhar, retorna a primeira imagem como fallback
+        return imageUrls[0] || null;
+      }
+
+      console.log('Colagem criada com sucesso:', data?.collageUrl);
+      return data?.collageUrl || imageUrls[0] || null;
+    } catch (error) {
+      console.error('Erro na função de colagem:', error);
+      // Se falhar, retorna a primeira imagem como fallback
+      return imageUrls[0] || null;
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -93,26 +112,32 @@ export const MemoryForm = ({ onSave, onCancel }: MemoryFormProps) => {
       // Upload das imagens
       let dumpImageUrl = null;
       if (images.length > 0) {
+        toast.success('Fazendo upload das imagens...');
         const uploadedUrls = await uploadImages(memory.id);
         
-        // Salvar URLs das imagens na tabela memory_images
-        for (const url of uploadedUrls) {
-          await supabase
-            .from('memory_images')
-            .insert({
-              memory_id: memory.id,
-              image_url: url
-            });
+        if (uploadedUrls.length > 0) {
+          // Salvar URLs das imagens na tabela memory_images
+          for (const url of uploadedUrls) {
+            await supabase
+              .from('memory_images')
+              .insert({
+                memory_id: memory.id,
+                image_url: url
+              });
+          }
+
+          // Criar colagem automática
+          toast.success('Criando colagem das imagens...');
+          dumpImageUrl = await createCollage(uploadedUrls, memory.id, title);
+
+          // Atualizar memória com dump image URL
+          if (dumpImageUrl) {
+            await supabase
+              .from('memories')
+              .update({ dump_image_url: dumpImageUrl })
+              .eq('id', memory.id);
+          }
         }
-
-        // Criar dump image
-        dumpImageUrl = await createDumpImage(uploadedUrls);
-
-        // Atualizar memória com dump image URL
-        await supabase
-          .from('memories')
-          .update({ dump_image_url: dumpImageUrl })
-          .eq('id', memory.id);
       }
 
       toast.success('Memória criada com sucesso!');
