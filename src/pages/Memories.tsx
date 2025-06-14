@@ -1,6 +1,7 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, LogOut, User } from 'lucide-react';
+import { Plus, LogOut, User, Heart } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { MemoryCard } from '@/components/MemoryCard';
@@ -9,6 +10,7 @@ import { ProfileDialog } from '@/components/ProfileDialog';
 import { MemoriesSkeleton } from '@/components/MemoriesSkeleton';
 import { MemoryOfTheDay } from '@/components/MemoryOfTheDay';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
 interface Memory {
   id: string;
@@ -18,6 +20,7 @@ interface Memory {
   music_url: string | null;
   dump_image_url: string | null;
   created_at: string;
+  is_favorite: boolean;
 }
 
 const Memories = () => {
@@ -26,6 +29,7 @@ const Memories = () => {
   const [showProfile, setShowProfile] = useState(false);
   const [loading, setLoading] = useState(true);
   const { user, signOut } = useAuth();
+  const navigate = useNavigate();
 
   const fetchMemories = async () => {
     try {
@@ -56,8 +60,33 @@ const Memories = () => {
   };
 
   const handleMemoryClick = (memory: Memory) => {
-    // Implementar visualização detalhada da memória
     console.log('Ver memória:', memory);
+  };
+
+  const handleToggleFavorite = async (memoryId: string, currentFavoriteState: boolean) => {
+    try {
+      const { error } = await supabase
+        .from('memories')
+        .update({ is_favorite: !currentFavoriteState })
+        .eq('id', memoryId);
+
+      if (error) throw error;
+
+      // Update local state
+      setMemories(prev => prev.map(memory => 
+        memory.id === memoryId 
+          ? { ...memory, is_favorite: !currentFavoriteState }
+          : memory
+      ));
+
+      toast.success(
+        !currentFavoriteState 
+          ? 'Memória adicionada aos favoritos!' 
+          : 'Memória removida dos favoritos!'
+      );
+    } catch (error: any) {
+      toast.error(`Erro ao atualizar favorito: ${error.message}`);
+    }
   };
 
   const handleMemorySaved = () => {
@@ -104,6 +133,14 @@ const Memories = () => {
               <Plus className="w-4 h-4 mr-2" />
               <span className="hidden sm:inline">Nova Memória</span>
               <span className="sm:hidden">Nova</span>
+            </Button>
+            <Button
+              onClick={() => navigate('/favorites')}
+              variant="outline"
+              size="icon"
+              className="hover:bg-slate-100 transition-colors"
+            >
+              <Heart className="w-4 h-4 text-red-500" />
             </Button>
             <Button 
               variant="outline" 
@@ -185,6 +222,7 @@ const Memories = () => {
                       key={memory.id}
                       memory={memory}
                       onClick={() => handleMemoryClick(memory)}
+                      onToggleFavorite={handleToggleFavorite}
                     />
                   ))}
                 </div>

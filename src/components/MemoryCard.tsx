@@ -1,7 +1,7 @@
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Music, Image, Clock } from 'lucide-react';
+import { Calendar, Music, Image, Clock, Star } from 'lucide-react';
 import { format, parseISO, isValid } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -13,14 +13,16 @@ interface Memory {
   music_url: string | null;
   dump_image_url: string | null;
   created_at: string;
+  is_favorite: boolean;
 }
 
 interface MemoryCardProps {
   memory: Memory;
   onClick: () => void;
+  onToggleFavorite?: (memoryId: string, currentFavoriteState: boolean) => void;
 }
 
-export const MemoryCard = ({ memory, onClick }: MemoryCardProps) => {
+export const MemoryCard = ({ memory, onClick, onToggleFavorite }: MemoryCardProps) => {
   const formatMemoryDate = (dateString: string) => {
     try {
       const date = parseISO(dateString);
@@ -43,11 +45,34 @@ export const MemoryCard = ({ memory, onClick }: MemoryCardProps) => {
     }
   };
 
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onToggleFavorite) {
+      onToggleFavorite(memory.id, memory.is_favorite);
+    }
+  };
+
   return (
     <Card 
-      className="group cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-2 bg-white border-slate-200 hover:border-slate-300 overflow-hidden"
+      className="group cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-2 bg-white border-slate-200 hover:border-slate-300 overflow-hidden relative"
       onClick={onClick}
     >
+      {/* Favorite Star */}
+      {onToggleFavorite && (
+        <button
+          onClick={handleFavoriteClick}
+          className="absolute top-3 right-3 z-10 p-2 rounded-full bg-white/80 backdrop-blur-sm shadow-lg hover:bg-white transition-all duration-200 hover:scale-110"
+        >
+          <Star 
+            className={`w-4 h-4 transition-colors ${
+              memory.is_favorite 
+                ? 'text-yellow-500 fill-yellow-500' 
+                : 'text-slate-400 hover:text-yellow-500'
+            }`}
+          />
+        </button>
+      )}
+
       {memory.dump_image_url && (
         <div className="aspect-video w-full overflow-hidden">
           <img 

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -17,6 +16,7 @@ interface Memory {
   music_url: string | null;
   dump_image_url: string | null;
   created_at: string;
+  is_favorite: boolean;
 }
 
 export const MemoryOfTheDay = () => {

@@ -15,6 +15,7 @@ export type Database = {
           description: string | null
           dump_image_url: string | null
           id: string
+          is_favorite: boolean
           memory_date: string
           music_url: string | null
           title: string
@@ -26,6 +27,7 @@ export type Database = {
           description?: string | null
           dump_image_url?: string | null
           id?: string
+          is_favorite?: boolean
           memory_date: string
           music_url?: string | null
           title: string
@@ -37,6 +39,7 @@ export type Database = {
           description?: string | null
           dump_image_url?: string | null
           id?: string
+          is_favorite?: boolean
           memory_date?: string
           music_url?: string | null
           title?: string
