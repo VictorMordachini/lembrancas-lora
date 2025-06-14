@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { MemoryCard } from '@/components/MemoryCard';
 import { MemoryForm } from '@/components/MemoryForm';
+import { ProfileDialog } from '@/components/ProfileDialog';
 import { toast } from 'sonner';
 
 interface Memory {
@@ -21,6 +22,7 @@ interface Memory {
 const Memories = () => {
   const [memories, setMemories] = useState<Memory[]>([]);
   const [showForm, setShowForm] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
   const [loading, setLoading] = useState(true);
   const { user, signOut } = useAuth();
 
@@ -102,7 +104,11 @@ const Memories = () => {
               <Plus className="w-4 h-4" />
               Nova Memória
             </Button>
-            <Button variant="outline" size="icon">
+            <Button 
+              variant="outline" 
+              size="icon"
+              onClick={() => setShowProfile(true)}
+            >
               <User className="w-4 h-4" />
             </Button>
             <Button 
@@ -153,6 +159,12 @@ const Memories = () => {
           </div>
         )}
       </main>
+
+      {/* Profile Dialog */}
+      <ProfileDialog 
+        open={showProfile} 
+        onOpenChange={setShowProfile} 
+      />
     </div>
   );
 };
