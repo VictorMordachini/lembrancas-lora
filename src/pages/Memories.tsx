@@ -115,7 +115,9 @@ const Memories = () => {
         {memories.length === 0 ? (
           <div className="text-center py-16">
             <div className="text-slate-400 mb-4">
-              <Calendar className="w-16 h-16 mx-auto mb-4" />
+              <div className="w-16 h-16 mx-auto mb-4 bg-slate-200 rounded-full flex items-center justify-center">
+                <Plus className="w-8 h-8 text-slate-400" />
+              </div>
               <h3 className="text-xl font-medium text-slate-600 mb-2">
                 Nenhuma memória ainda
               </h3>
