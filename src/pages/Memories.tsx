@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus, LogOut, User, Heart } from 'lucide-react';
+import { Plus, LogOut, User, Heart, Globe } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { MemoryCard } from '@/components/MemoryCard';
@@ -21,6 +21,7 @@ interface Memory {
   dump_image_url: string | null;
   created_at: string;
   is_favorite: boolean;
+  is_public: boolean;
 }
 
 const Memories = () => {
@@ -120,7 +121,7 @@ const Memories = () => {
               className="h-10 w-10"
             />
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-slate-800">Memórias</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold text-slate-800">Minhas Memórias</h1>
               <p className="text-sm text-slate-500 hidden sm:block">Suas lembranças especiais</p>
             </div>
           </div>
@@ -133,6 +134,15 @@ const Memories = () => {
               <Plus className="w-4 h-4 mr-2" />
               <span className="hidden sm:inline">Nova Memória</span>
               <span className="sm:hidden">Nova</span>
+            </Button>
+            <Button
+              onClick={() => navigate('/')}
+              variant="outline"
+              size="icon"
+              className="hover:bg-slate-100 transition-colors"
+              title="Ver feed público"
+            >
+              <Globe className="w-4 h-4 text-blue-500" />
             </Button>
             <Button
               onClick={() => navigate('/favorites')}
@@ -223,6 +233,7 @@ const Memories = () => {
                       memory={memory}
                       onClick={() => handleMemoryClick(memory)}
                       onToggleFavorite={handleToggleFavorite}
+                      showPublicBadge={true}
                     />
                   ))}
                 </div>

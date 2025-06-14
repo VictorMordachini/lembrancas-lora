@@ -1,7 +1,7 @@
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Music, Image, Clock, Star } from 'lucide-react';
+import { Calendar, Music, Image, Clock, Star, Globe } from 'lucide-react';
 import { format, parseISO, isValid } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
@@ -14,15 +14,17 @@ interface Memory {
   dump_image_url: string | null;
   created_at: string;
   is_favorite: boolean;
+  is_public: boolean;
 }
 
 interface MemoryCardProps {
   memory: Memory;
   onClick: () => void;
   onToggleFavorite?: (memoryId: string, currentFavoriteState: boolean) => void;
+  showPublicBadge?: boolean;
 }
 
-export const MemoryCard = ({ memory, onClick, onToggleFavorite }: MemoryCardProps) => {
+export const MemoryCard = ({ memory, onClick, onToggleFavorite, showPublicBadge = false }: MemoryCardProps) => {
   const formatMemoryDate = (dateString: string) => {
     try {
       const date = parseISO(dateString);
@@ -57,21 +59,30 @@ export const MemoryCard = ({ memory, onClick, onToggleFavorite }: MemoryCardProp
       className="group cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-2 bg-white border-slate-200 hover:border-slate-300 overflow-hidden relative"
       onClick={onClick}
     >
-      {/* Favorite Star */}
-      {onToggleFavorite && (
-        <button
-          onClick={handleFavoriteClick}
-          className="absolute top-3 right-3 z-10 p-2 rounded-full bg-white/80 backdrop-blur-sm shadow-lg hover:bg-white transition-all duration-200 hover:scale-110"
-        >
-          <Star 
-            className={`w-4 h-4 transition-colors ${
-              memory.is_favorite 
-                ? 'text-yellow-500 fill-yellow-500' 
-                : 'text-slate-400 hover:text-yellow-500'
-            }`}
-          />
-        </button>
-      )}
+      {/* Badges container */}
+      <div className="absolute top-3 right-3 z-10 flex gap-2">
+        {showPublicBadge && memory.is_public && (
+          <div className="p-2 rounded-full bg-green-100 backdrop-blur-sm shadow-lg">
+            <Globe className="w-4 h-4 text-green-600" />
+          </div>
+        )}
+        
+        {/* Favorite Star */}
+        {onToggleFavorite && (
+          <button
+            onClick={handleFavoriteClick}
+            className="p-2 rounded-full bg-white/80 backdrop-blur-sm shadow-lg hover:bg-white transition-all duration-200 hover:scale-110"
+          >
+            <Star 
+              className={`w-4 h-4 transition-colors ${
+                memory.is_favorite 
+                  ? 'text-yellow-500 fill-yellow-500' 
+                  : 'text-slate-400 hover:text-yellow-500'
+              }`}
+            />
+          </button>
+        )}
+      </div>
 
       {memory.dump_image_url && (
         <div className="aspect-video w-full overflow-hidden">

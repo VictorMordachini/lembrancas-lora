@@ -2,17 +2,12 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import PublicFeed from './PublicFeed';
 import Memories from './Memories';
 
 const Index = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!loading && !user) {
-      navigate('/auth');
-    }
-  }, [user, loading, navigate]);
 
   if (loading) {
     return (
@@ -22,11 +17,13 @@ const Index = () => {
     );
   }
 
-  if (!user) {
-    return null;
+  // Se o usuário está logado, mostrar suas memórias
+  if (user) {
+    return <Memories />;
   }
 
-  return <Memories />;
+  // Se não está logado, mostrar o feed público
+  return <PublicFeed />;
 };
 
 export default Index;
