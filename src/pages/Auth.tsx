@@ -61,7 +61,7 @@ const Auth = () => {
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl text-center text-slate-800">Memórias</CardTitle>
           <CardDescription className="text-center text-slate-600">
-            Entre na sua conta ou crie uma nova
+            Guarde suas lembranças mais especiais
           </CardDescription>
         </CardHeader>
         <CardContent>
