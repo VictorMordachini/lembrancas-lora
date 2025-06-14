@@ -1,11 +1,12 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { LogIn, User } from 'lucide-react';
+import { LogIn, User, Heart, BookOpen } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { MemoryCard } from '@/components/MemoryCard';
 import { MemoriesSkeleton } from '@/components/MemoriesSkeleton';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
 
 interface Memory {
   id: string;
@@ -23,6 +24,7 @@ const PublicFeed = () => {
   const [memories, setMemories] = useState<Memory[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const fetchPublicMemories = async () => {
     try {
@@ -62,19 +64,42 @@ const PublicFeed = () => {
               className="h-10 w-10"
             />
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-slate-800">Memórias Públicas</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold text-slate-800">Feed Público</h1>
               <p className="text-sm text-slate-500 hidden sm:block">Descubra memórias especiais compartilhadas pela comunidade</p>
             </div>
           </div>
           <div className="flex items-center gap-2 sm:gap-3">
-            <Button
-              onClick={() => navigate('/auth')}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg transition-all duration-200 hover:shadow-xl hover:scale-105"
-            >
-              <LogIn className="w-4 h-4 mr-2" />
-              <span className="hidden sm:inline">Entrar / Criar Conta</span>
-              <span className="sm:hidden">Entrar</span>
-            </Button>
+            {user ? (
+              // Usuário logado - mostrar navegação para suas seções
+              <>
+                <Button
+                  onClick={() => navigate('/memories')}
+                  variant="outline"
+                  className="hover:bg-slate-100 transition-colors"
+                >
+                  <BookOpen className="w-4 h-4 mr-2" />
+                  <span className="hidden sm:inline">Minhas Memórias</span>
+                  <span className="sm:hidden">Minhas</span>
+                </Button>
+                <Button
+                  onClick={() => navigate('/favorites')}
+                  variant="outline"
+                  className="hover:bg-slate-100 transition-colors"
+                >
+                  <Heart className="w-4 h-4 text-red-500" />
+                </Button>
+              </>
+            ) : (
+              // Usuário não logado - mostrar botão de login
+              <Button
+                onClick={() => navigate('/auth')}
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg transition-all duration-200 hover:shadow-xl hover:scale-105"
+              >
+                <LogIn className="w-4 h-4 mr-2" />
+                <span className="hidden sm:inline">Entrar / Criar Conta</span>
+                <span className="sm:hidden">Entrar</span>
+              </Button>
+            )}
           </div>
         </div>
       </header>
@@ -99,16 +124,30 @@ const PublicFeed = () => {
                     Nenhuma memória pública ainda
                   </h3>
                   <p className="text-slate-500 mb-8 leading-relaxed">
-                    Seja o primeiro a compartilhar suas memórias especiais com a comunidade!
+                    {user 
+                      ? "Seja o primeiro a compartilhar suas memórias com a comunidade!"
+                      : "Seja o primeiro a compartilhar suas memórias especiais com a comunidade!"
+                    }
                   </p>
-                  <Button 
-                    onClick={() => navigate('/auth')} 
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg transition-all duration-200 hover:shadow-xl hover:scale-105 px-8 py-3 text-lg"
-                    size="lg"
-                  >
-                    <User className="w-5 h-5 mr-2" />
-                    Criar conta e compartilhar
-                  </Button>
+                  {user ? (
+                    <Button 
+                      onClick={() => navigate('/memories')} 
+                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg transition-all duration-200 hover:shadow-xl hover:scale-105 px-8 py-3 text-lg"
+                      size="lg"
+                    >
+                      <BookOpen className="w-5 h-5 mr-2" />
+                      Criar minha primeira memória
+                    </Button>
+                  ) : (
+                    <Button 
+                      onClick={() => navigate('/auth')} 
+                      className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg transition-all duration-200 hover:shadow-xl hover:scale-105 px-8 py-3 text-lg"
+                      size="lg"
+                    >
+                      <User className="w-5 h-5 mr-2" />
+                      Criar conta e compartilhar
+                    </Button>
+                  )}
                 </div>
               </div>
             ) : (

@@ -1,13 +1,9 @@
 
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import PublicFeed from './PublicFeed';
-import Memories from './Memories';
 
 const Index = () => {
-  const { user, loading } = useAuth();
-  const navigate = useNavigate();
+  const { loading } = useAuth();
 
   if (loading) {
     return (
@@ -17,12 +13,7 @@ const Index = () => {
     );
   }
 
-  // Se o usuário está logado, mostrar suas memórias
-  if (user) {
-    return <Memories />;
-  }
-
-  // Se não está logado, mostrar o feed público
+  // Sempre mostrar o feed público como página inicial
   return <PublicFeed />;
 };
 
