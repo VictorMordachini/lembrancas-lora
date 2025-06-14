@@ -59,6 +59,13 @@ const Auth = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
+          <div className="flex justify-center mb-4">
+            <img 
+              src="/lovable-uploads/6be612b2-2efe-4135-ab7b-60dcc88c8ad0.png" 
+              alt="Memórias Logo" 
+              className="h-16 w-16"
+            />
+          </div>
           <CardTitle className="text-2xl text-center text-slate-800">Memórias</CardTitle>
           <CardDescription className="text-center text-slate-600">
             Guarde suas lembranças mais especiais

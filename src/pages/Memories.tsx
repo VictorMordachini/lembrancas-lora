@@ -86,7 +86,14 @@ const Memories = () => {
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-slate-200">
         <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-slate-800">Minhas Memórias</h1>
+          <div className="flex items-center gap-3">
+            <img 
+              src="/lovable-uploads/6be612b2-2efe-4135-ab7b-60dcc88c8ad0.png" 
+              alt="Memórias Logo" 
+              className="h-8 w-8"
+            />
+            <h1 className="text-2xl font-bold text-slate-800">Minhas Memórias</h1>
+          </div>
           <div className="flex items-center gap-3">
             <Button
               onClick={() => setShowForm(true)}
@@ -116,7 +123,11 @@ const Memories = () => {
           <div className="text-center py-16">
             <div className="text-slate-400 mb-4">
               <div className="w-16 h-16 mx-auto mb-4 bg-slate-200 rounded-full flex items-center justify-center">
-                <Plus className="w-8 h-8 text-slate-400" />
+                <img 
+                  src="/lovable-uploads/6be612b2-2efe-4135-ab7b-60dcc88c8ad0.png" 
+                  alt="Memórias Logo" 
+                  className="w-8 h-8 opacity-50"
+                />
               </div>
               <h3 className="text-xl font-medium text-slate-600 mb-2">
                 Nenhuma memória ainda
