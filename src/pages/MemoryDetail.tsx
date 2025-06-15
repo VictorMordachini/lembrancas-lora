@@ -1,10 +1,10 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Calendar, Music, Star, Globe, Heart, User } from 'lucide-react';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { ArrowLeft, Calendar, Music, Star, Globe, Heart, User, ImageIcon, ZoomIn } from 'lucide-react';
 import { format, parseISO, isValid } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { supabase } from '@/integrations/supabase/client';
@@ -31,6 +31,53 @@ interface MemoryImage {
   memory_id: string;
 }
 
+const ImageWithFallback = ({ src, alt, className, onClick }: {
+  src: string;
+  alt: string;
+  className?: string;
+  onClick?: () => void;
+}) => {
+  const [imageError, setImageError] = useState(false);
+  const [imageLoading, setImageLoading] = useState(true);
+
+  return (
+    <div className={`relative overflow-hidden bg-slate-100 ${className}`}>
+      {imageLoading && !imageError && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="animate-spin w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+        </div>
+      )}
+      
+      {imageError ? (
+        <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 bg-slate-50">
+          <ImageIcon className="w-8 h-8 mb-2" />
+          <span className="text-sm">Erro ao carregar</span>
+        </div>
+      ) : (
+        <img
+          src={src}
+          alt={alt}
+          className={`w-full h-full object-cover transition-all duration-200 ${
+            onClick ? 'hover:scale-105 cursor-pointer' : ''
+          } ${imageLoading ? 'opacity-0' : 'opacity-100'}`}
+          onLoad={() => setImageLoading(false)}
+          onError={() => {
+            setImageError(true);
+            setImageLoading(false);
+          }}
+          onClick={onClick}
+        />
+      )}
+      
+      {onClick && !imageError && (
+        <div className="absolute top-2 right-2 bg-black/50 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+          <ZoomIn className="w-4 h-4" />
+        </div>
+      )}
+    </div>
+  );
+};
+
 const MemoryDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -39,6 +86,7 @@ const MemoryDetail = () => {
   const [memoryImages, setMemoryImages] = useState<MemoryImage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const fetchMemoryDetail = async () => {
     if (!id) {
@@ -170,6 +218,10 @@ const MemoryDetail = () => {
   }
 
   const isOwner = user && memory.user_id === user.id;
+  const allImages = [
+    ...(memory.dump_image_url ? [{ url: memory.dump_image_url, type: 'dump' as const }] : []),
+    ...memoryImages.map(img => ({ url: img.image_url, type: 'uploaded' as const, id: img.id }))
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
@@ -207,17 +259,6 @@ const MemoryDetail = () => {
       {/* Content */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Card className="overflow-hidden">
-          {/* Main image or collage */}
-          {memory.dump_image_url && (
-            <div className="aspect-video w-full overflow-hidden">
-              <img 
-                src={memory.dump_image_url} 
-                alt={memory.title}
-                className="w-full h-full object-cover"
-              />
-            </div>
-          )}
-
           <CardHeader>
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
               <div className="space-y-2">
@@ -268,6 +309,74 @@ const MemoryDetail = () => {
               </div>
             )}
 
+            {/* Images Gallery */}
+            {allImages.length > 0 && (
+              <div>
+                <h3 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
+                  <ImageIcon className="w-5 h-5 text-blue-500" />
+                  Imagens da Memória ({allImages.length})
+                </h3>
+                
+                {/* Main dump image if exists */}
+                {memory.dump_image_url && (
+                  <div className="mb-6">
+                    <h4 className="text-md font-medium text-slate-700 mb-3">Colagem Principal</h4>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <div className="group cursor-pointer">
+                          <ImageWithFallback
+                            src={memory.dump_image_url}
+                            alt={`${memory.title} - Colagem`}
+                            className="aspect-video w-full rounded-lg"
+                            onClick={() => {}}
+                          />
+                        </div>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-4xl max-h-[90vh] p-0">
+                        <ImageWithFallback
+                          src={memory.dump_image_url}
+                          alt={`${memory.title} - Colagem`}
+                          className="w-full h-full rounded-lg"
+                        />
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                )}
+
+                {/* Individual uploaded images */}
+                {memoryImages.length > 0 && (
+                  <div>
+                    <h4 className="text-md font-medium text-slate-700 mb-3">
+                      Imagens Originais ({memoryImages.length})
+                    </h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {memoryImages.map((image, index) => (
+                        <Dialog key={image.id}>
+                          <DialogTrigger asChild>
+                            <div className="group cursor-pointer">
+                              <ImageWithFallback
+                                src={image.image_url}
+                                alt={`${memory.title} - Imagem ${index + 1}`}
+                                className="aspect-square rounded-lg"
+                                onClick={() => {}}
+                              />
+                            </div>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-4xl max-h-[90vh] p-0">
+                            <ImageWithFallback
+                              src={image.image_url}
+                              alt={`${memory.title} - Imagem ${index + 1}`}
+                              className="w-full h-full rounded-lg"
+                            />
+                          </DialogContent>
+                        </Dialog>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Music */}
             {memory.music_url && (
               <div>
@@ -284,27 +393,6 @@ const MemoryDetail = () => {
                   >
                     {memory.music_url}
                   </a>
-                </div>
-              </div>
-            )}
-
-            {/* Individual Images */}
-            {memoryImages.length > 0 && (
-              <div>
-                <h3 className="text-lg font-semibold text-slate-800 mb-3">
-                  Imagens ({memoryImages.length})
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {memoryImages.map((image, index) => (
-                    <div key={image.id} className="aspect-square overflow-hidden rounded-lg bg-slate-100">
-                      <img 
-                        src={image.image_url} 
-                        alt={`${memory.title} - Imagem ${index + 1}`}
-                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-200 cursor-pointer"
-                        onClick={() => window.open(image.image_url, '_blank')}
-                      />
-                    </div>
-                  ))}
                 </div>
               </div>
             )}
