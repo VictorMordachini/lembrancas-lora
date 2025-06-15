@@ -22,9 +22,16 @@ interface MemoryImage {
   memory_id: string;
 }
 
+interface PeopleTag {
+  id: string;
+  name: string;
+  avatar_url: string | null;
+}
+
 export const useMemoryEdit = (memoryId: string) => {
   const [memory, setMemory] = useState<Memory | null>(null);
   const [memoryImages, setMemoryImages] = useState<MemoryImage[]>([]);
+  const [participants, setParticipants] = useState<PeopleTag[]>([]);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const { user } = useAuth();
@@ -47,6 +54,26 @@ export const useMemoryEdit = (memoryId: string) => {
 
       if (imagesError) throw imagesError;
       setMemoryImages(imagesData || []);
+
+      // Fetch memory participants
+      const { data: participantsData, error: participantsError } = await supabase
+        .from('memory_participants')
+        .select(`
+          people_tags (
+            id,
+            name,
+            avatar_url
+          )
+        `)
+        .eq('memory_id', memoryId);
+
+      if (participantsError) throw participantsError;
+      
+      const peopleTagsData = participantsData
+        ?.map(item => item.people_tags)
+        .filter(Boolean) as PeopleTag[];
+
+      setParticipants(peopleTagsData || []);
     } catch (error: any) {
       toast.error(`Erro ao carregar memória: ${error.message}`);
     } finally {
@@ -110,6 +137,35 @@ export const useMemoryEdit = (memoryId: string) => {
     }
   };
 
+  const updateMemoryParticipants = async (selectedTags: PeopleTag[]) => {
+    try {
+      // First, remove all existing participants
+      await supabase
+        .from('memory_participants')
+        .delete()
+        .eq('memory_id', memoryId);
+
+      // Then add new participants
+      if (selectedTags.length > 0) {
+        const participantsToInsert = selectedTags.map(tag => ({
+          memory_id: memoryId,
+          people_tag_id: tag.id
+        }));
+
+        const { error } = await supabase
+          .from('memory_participants')
+          .insert(participantsToInsert);
+
+        if (error) throw error;
+      }
+
+      setParticipants(selectedTags);
+    } catch (error: any) {
+      toast.error(`Erro ao atualizar participantes: ${error.message}`);
+      throw error;
+    }
+  };
+
   const updateMemory = async (
     title: string,
     description: string,
@@ -117,7 +173,8 @@ export const useMemoryEdit = (memoryId: string) => {
     musicUrl: string,
     isPublic: boolean,
     isFavorite: boolean,
-    newImages: File[]
+    newImages: File[],
+    selectedParticipants: PeopleTag[]
   ) => {
     if (!user || !memory) return false;
 
@@ -180,6 +237,9 @@ export const useMemoryEdit = (memoryId: string) => {
 
       if (error) throw error;
 
+      // Update participants
+      await updateMemoryParticipants(selectedParticipants);
+
       // Refresh data
       await fetchMemory();
       toast.success('Memória atualizada com sucesso!');
@@ -202,6 +262,7 @@ export const useMemoryEdit = (memoryId: string) => {
   return {
     memory,
     memoryImages,
+    participants,
     loading,
     updating,
     updateMemory,
