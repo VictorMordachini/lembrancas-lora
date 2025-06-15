@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -7,7 +8,14 @@ import { BasicFields } from '@/components/memory-form/BasicFields';
 import { PrivacyControl } from '@/components/memory-form/PrivacyControl';
 import { ImageUpload } from '@/components/memory-form/ImageUpload';
 import { MusicField } from '@/components/memory-form/MusicField';
+import { PeopleTagSelector } from '@/components/PeopleTagSelector';
 import { useMemorySubmit } from '@/hooks/useMemorySubmit';
+
+interface PeopleTag {
+  id: string;
+  name: string;
+  avatar_url: string | null;
+}
 
 interface MemoryFormProps {
   onSave: () => void;
@@ -21,6 +29,7 @@ export const MemoryForm = ({ onSave, onCancel }: MemoryFormProps) => {
   const [musicUrl, setMusicUrl] = useState('');
   const [images, setImages] = useState<File[]>([]);
   const [isPublic, setIsPublic] = useState(false);
+  const [selectedPeopleTags, setSelectedPeopleTags] = useState<PeopleTag[]>([]);
   
   const { loading, submitMemory } = useMemorySubmit();
 
@@ -44,7 +53,8 @@ export const MemoryForm = ({ onSave, onCancel }: MemoryFormProps) => {
       memoryDate,
       musicUrl,
       images,
-      isPublic
+      isPublic,
+      selectedPeopleTags
     );
 
     if (success) {
@@ -81,6 +91,12 @@ export const MemoryForm = ({ onSave, onCancel }: MemoryFormProps) => {
             <MusicField
               musicUrl={musicUrl}
               setMusicUrl={setMusicUrl}
+            />
+
+            <PeopleTagSelector
+              selectedTags={selectedPeopleTags}
+              onTagsChange={setSelectedPeopleTags}
+              disabled={loading}
             />
 
             <div className="flex gap-3 pt-4">

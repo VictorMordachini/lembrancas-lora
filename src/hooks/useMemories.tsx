@@ -33,7 +33,7 @@ export const useMemories = () => {
         .from('memories')
         .select(`
           *,
-          profiles!inner (
+          profiles (
             username,
             full_name,
             avatar_url
@@ -43,7 +43,16 @@ export const useMemories = () => {
         .order('memory_date', { ascending: false });
 
       if (error) throw error;
-      setMemories(data || []);
+      
+      // Type-safe data handling
+      const typedMemories = (data || []).map(memory => ({
+        ...memory,
+        profiles: memory.profiles && typeof memory.profiles === 'object' && !Array.isArray(memory.profiles)
+          ? memory.profiles as { username: string; full_name: string | null; avatar_url: string | null; }
+          : null
+      }));
+      
+      setMemories(typedMemories);
     } catch (error: any) {
       toast.error(`Erro ao carregar memórias: ${error.message}`);
     } finally {

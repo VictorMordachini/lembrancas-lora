@@ -7,6 +7,7 @@ import { Calendar, Music, Image, Clock, Star, Globe, Edit, User } from 'lucide-r
 import { format, parseISO, isValid } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useNavigate } from 'react-router-dom';
+import { MemoryParticipants } from '@/components/MemoryParticipants';
 
 interface Memory {
   id: string;
@@ -201,6 +202,9 @@ export const MemoryCard = ({
                 Criada em {formatCreatedDate(memory.created_at)}
               </span>
             </div>
+
+            {/* Memory Participants */}
+            <MemoryParticipants memoryId={memory.id} className="pt-1" />
           </div>
           
           <div className="flex flex-wrap gap-2 pt-2">

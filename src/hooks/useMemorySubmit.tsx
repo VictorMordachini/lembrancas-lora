@@ -4,6 +4,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 
+interface PeopleTag {
+  id: string;
+  name: string;
+  avatar_url: string | null;
+}
+
 export const useMemorySubmit = () => {
   const [loading, setLoading] = useState(false);
   const { user } = useAuth();
@@ -54,13 +60,34 @@ export const useMemorySubmit = () => {
     }
   };
 
+  const addMemoryParticipants = async (memoryId: string, peopleTags: PeopleTag[]) => {
+    if (peopleTags.length === 0) return;
+
+    try {
+      const participants = peopleTags.map(tag => ({
+        memory_id: memoryId,
+        people_tag_id: tag.id
+      }));
+
+      const { error } = await supabase
+        .from('memory_participants')
+        .insert(participants);
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('Erro ao adicionar participantes:', error);
+      toast.error('Erro ao adicionar pessoas marcadas');
+    }
+  };
+
   const submitMemory = async (
     title: string,
     description: string,
     memoryDate: string,
     musicUrl: string,
     images: File[],
-    isPublic: boolean
+    isPublic: boolean,
+    peopleTags: PeopleTag[] = []
   ) => {
     if (!title.trim() || !memoryDate) {
       toast.error('Por favor, preencha pelo menos o título e a data da memória.');
@@ -129,6 +156,11 @@ export const useMemorySubmit = () => {
           .from('memories')
           .update({ dump_image_url: finalDumpImageUrl })
           .eq('id', memory.id);
+      }
+
+      // 4. Adicionar pessoas marcadas
+      if (peopleTags.length > 0) {
+        await addMemoryParticipants(memory.id, peopleTags);
       }
 
       return true;
