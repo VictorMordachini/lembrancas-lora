@@ -53,7 +53,20 @@ export const useAuth = () => {
   };
 
   const signOut = async () => {
+    // Verifica se há uma sessão ativa antes de tentar fazer logout
+    if (!session && !user) {
+      // Se não há sessão ativa, apenas limpa o estado local
+      setSession(null);
+      setUser(null);
+      return { error: null };
+    }
+
     const { error } = await supabase.auth.signOut();
+    
+    // Limpa o estado local independente do resultado
+    setSession(null);
+    setUser(null);
+    
     return { error };
   };
 
