@@ -44,8 +44,6 @@ export const PeopleBadges = ({
     lg: 'h-10 w-10 text-base'
   };
 
-  const badgeSize = size === 'sm' ? 'sm' : 'default';
-
   return (
     <div className={`flex items-center gap-2 ${className}`}>
       <div className="flex items-center gap-1">
@@ -58,7 +56,6 @@ export const PeopleBadges = ({
           <Badge
             key={participant.id}
             variant="secondary"
-            size={badgeSize}
             className="flex items-center gap-2 pl-1"
           >
             <Avatar className={sizeClasses[size]}>
@@ -75,7 +72,7 @@ export const PeopleBadges = ({
         ))}
         
         {remainingCount > 0 && (
-          <Badge variant="outline" size={badgeSize}>
+          <Badge variant="outline">
             +{remainingCount} mais
           </Badge>
         )}
