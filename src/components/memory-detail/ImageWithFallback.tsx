@@ -1,7 +1,6 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { ImageIcon, ZoomIn } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 
 interface ImageWithFallbackProps {
   src: string;
@@ -13,36 +12,6 @@ interface ImageWithFallbackProps {
 export const ImageWithFallback = ({ src, alt, className, onClick }: ImageWithFallbackProps) => {
   const [imageError, setImageError] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
-  const [signedUrl, setSignedUrl] = useState<string | null>(null);
-
-  useEffect(() => {
-    const getSignedUrl = async () => {
-      // If it's already a full URL, use it directly
-      if (src.startsWith('http')) {
-        setSignedUrl(src);
-        return;
-      }
-
-      // If it's a storage path, get signed URL
-      try {
-        const { data, error } = await supabase.storage
-          .from('memory-images')
-          .createSignedUrl(src, 3600); // 1 hour expiry
-
-        if (error) {
-          console.error('Error creating signed URL:', error);
-          setImageError(true);
-        } else {
-          setSignedUrl(data.signedUrl);
-        }
-      } catch (error) {
-        console.error('Error getting signed URL:', error);
-        setImageError(true);
-      }
-    };
-
-    getSignedUrl();
-  }, [src]);
 
   const handleImageLoad = () => {
     setImageLoading(false);
@@ -51,6 +20,7 @@ export const ImageWithFallback = ({ src, alt, className, onClick }: ImageWithFal
   const handleImageError = () => {
     setImageError(true);
     setImageLoading(false);
+    console.error('Failed to load image:', src);
   };
 
   return (
@@ -67,18 +37,16 @@ export const ImageWithFallback = ({ src, alt, className, onClick }: ImageWithFal
           <span className="text-sm">Erro ao carregar</span>
         </div>
       ) : (
-        signedUrl && (
-          <img
-            src={signedUrl}
-            alt={alt}
-            className={`w-full h-full object-cover transition-all duration-200 ${
-              onClick ? 'hover:scale-105 cursor-pointer' : ''
-            } ${imageLoading ? 'opacity-0' : 'opacity-100'}`}
-            onLoad={handleImageLoad}
-            onError={handleImageError}
-            onClick={onClick}
-          />
-        )
+        <img
+          src={src}
+          alt={alt}
+          className={`w-full h-full object-cover transition-all duration-200 ${
+            onClick ? 'hover:scale-105 cursor-pointer' : ''
+          } ${imageLoading ? 'opacity-0' : 'opacity-100'}`}
+          onLoad={handleImageLoad}
+          onError={handleImageError}
+          onClick={onClick}
+        />
       )}
       
       {onClick && !imageError && !imageLoading && (
