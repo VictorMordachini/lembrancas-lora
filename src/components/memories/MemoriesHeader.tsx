@@ -13,7 +13,7 @@ export const MemoriesHeader = ({ onNewMemory, onShowProfile, onSignOut }: Memori
   const navigate = useNavigate();
 
   return (
-    <header className="bg-white/20 backdrop-blur-sm shadow-sm border-b border-white/30 sticky top-0 z-10">
+    <header className="bg-white shadow-sm border-b sticky top-0 z-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
         <div className="flex items-center gap-3">
           <img 
@@ -22,8 +22,8 @@ export const MemoriesHeader = ({ onNewMemory, onShowProfile, onSignOut }: Memori
             className="h-10 w-10"
           />
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-white">Minhas Memórias</h1>
-            <p className="text-sm text-white/80 hidden sm:block">Suas lembranças especiais</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Minhas Memórias</h1>
+            <p className="text-sm text-gray-600 hidden sm:block">Suas lembranças especiais</p>
           </div>
         </div>
         <div className="flex items-center gap-2 sm:gap-3">
@@ -32,7 +32,7 @@ export const MemoriesHeader = ({ onNewMemory, onShowProfile, onSignOut }: Memori
             className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg transition-all duration-200 hover:shadow-xl hover:scale-105 px-4 sm:px-6"
             size="default"
           >
-            <Plus className="w-4 h-4 mr-2 text-white" />
+            <Plus className="w-4 h-4 mr-2" />
             <span className="hidden sm:inline">Nova Memória</span>
             <span className="sm:hidden">Nova</span>
           </Button>
@@ -40,16 +40,16 @@ export const MemoriesHeader = ({ onNewMemory, onShowProfile, onSignOut }: Memori
             onClick={() => navigate('/')}
             variant="outline"
             size="icon"
-            className="bg-white/20 hover:bg-white/30 text-white border-white/30 hover:border-white/50 transition-colors"
+            className="transition-colors"
             title="Ver feed público"
           >
-            <Globe className="w-4 h-4 text-white" />
+            <Globe className="w-4 h-4" />
           </Button>
           <Button
             onClick={() => navigate('/favorites')}
             variant="outline"
             size="icon"
-            className="bg-white/20 hover:bg-white/30 text-white border-white/30 hover:border-white/50 transition-colors"
+            className="transition-colors"
           >
             <Heart className="w-4 h-4 text-red-500" />
           </Button>
@@ -57,25 +57,25 @@ export const MemoriesHeader = ({ onNewMemory, onShowProfile, onSignOut }: Memori
             variant="outline" 
             size="icon"
             onClick={onShowProfile}
-            className="bg-white/20 hover:bg-white/30 text-white border-white/30 hover:border-white/50 transition-colors"
+            className="transition-colors"
           >
-            <User className="w-4 h-4 text-white" />
+            <User className="w-4 h-4" />
           </Button>
           <Button 
             variant="outline" 
             onClick={onSignOut}
-            className="hidden sm:flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white border-white/30 hover:border-white/50 transition-colors"
+            className="hidden sm:flex items-center gap-2 transition-colors"
           >
-            <LogOut className="w-4 h-4 text-white" />
+            <LogOut className="w-4 h-4" />
             Sair
           </Button>
           <Button 
             variant="outline" 
             size="icon"
             onClick={onSignOut}
-            className="sm:hidden bg-white/20 hover:bg-white/30 text-white border-white/30 hover:border-white/50 transition-colors"
+            className="sm:hidden transition-colors"
           >
-            <LogOut className="w-4 h-4 text-white" />
+            <LogOut className="w-4 h-4" />
           </Button>
         </div>
       </div>
