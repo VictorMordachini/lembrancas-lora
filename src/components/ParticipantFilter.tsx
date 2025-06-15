@@ -35,6 +35,11 @@ export const ParticipantFilter = ({
     return <div className="text-sm text-gray-500">Carregando filtros...</div>;
   }
 
+  // Don't render if no tags available
+  if (!safeTags.length) {
+    return null;
+  }
+
   return (
     <div className={cn("flex items-center gap-2", className)}>
       {selectedTag && (
@@ -75,39 +80,41 @@ export const ParticipantFilter = ({
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-80 p-0">
-          <Command>
-            <CommandInput placeholder="Buscar pessoa..." />
-            <CommandEmpty>Nenhuma pessoa encontrada.</CommandEmpty>
-            <CommandGroup>
-              {safeTags.map((tag) => (
-                <CommandItem
-                  key={tag.id}
-                  value={tag.name}
-                  onSelect={() => {
-                    onParticipantSelect(tag.id);
-                    setOpen(false);
-                  }}
-                  className="flex items-center gap-3"
-                >
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={tag.avatar_url || ''} alt={tag.name} />
-                    <AvatarFallback className="text-xs bg-slate-100 text-slate-600">
-                      {getTagInitials(tag.name)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <span>{tag.name}</span>
-                  </div>
-                  <Check
-                    className={cn(
-                      "ml-auto h-4 w-4",
-                      selectedParticipantId === tag.id ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </Command>
+          {safeTags.length > 0 && (
+            <Command>
+              <CommandInput placeholder="Buscar pessoa..." />
+              <CommandEmpty>Nenhuma pessoa encontrada.</CommandEmpty>
+              <CommandGroup>
+                {safeTags.map((tag) => (
+                  <CommandItem
+                    key={tag.id}
+                    value={tag.name}
+                    onSelect={() => {
+                      onParticipantSelect(tag.id);
+                      setOpen(false);
+                    }}
+                    className="flex items-center gap-3"
+                  >
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={tag.avatar_url || ''} alt={tag.name} />
+                      <AvatarFallback className="text-xs bg-slate-100 text-slate-600">
+                        {getTagInitials(tag.name)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <span>{tag.name}</span>
+                    </div>
+                    <Check
+                      className={cn(
+                        "ml-auto h-4 w-4",
+                        selectedParticipantId === tag.id ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </Command>
+          )}
         </PopoverContent>
       </Popover>
     </div>

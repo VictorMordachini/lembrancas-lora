@@ -43,7 +43,7 @@ export const PeopleTagSelector = ({
     if (!newTagName.trim()) return;
 
     setIsCreating(true);
-    const newTag = await createTag(newTagName, undefined, false);
+    const newTag = await createTag(newTagName, undefined);
     
     if (newTag) {
       onSelectionChange([...selectedTagIds, newTag.id]);
@@ -142,32 +142,34 @@ export const PeopleTagSelector = ({
                 </div>
               </div>
             </CommandEmpty>
-            <CommandGroup>
-              {availableTags.map((tag) => (
-                <CommandItem
-                  key={tag.id}
-                  value={tag.name}
-                  onSelect={() => handleTagSelect(tag.id)}
-                  className="flex items-center gap-3"
-                >
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={tag.avatar_url || ''} alt={tag.name} />
-                    <AvatarFallback className="text-xs bg-slate-100 text-slate-600">
-                      {getTagInitials(tag.name)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <span>{tag.name}</span>
-                  </div>
-                  <Check
-                    className={cn(
-                      "ml-auto h-4 w-4",
-                      selectedTagIds.includes(tag.id) ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                </CommandItem>
-              ))}
-            </CommandGroup>
+            {availableTags.length > 0 && (
+              <CommandGroup>
+                {availableTags.map((tag) => (
+                  <CommandItem
+                    key={tag.id}
+                    value={tag.name}
+                    onSelect={() => handleTagSelect(tag.id)}
+                    className="flex items-center gap-3"
+                  >
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={tag.avatar_url || ''} alt={tag.name} />
+                      <AvatarFallback className="text-xs bg-slate-100 text-slate-600">
+                        {getTagInitials(tag.name)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <span>{tag.name}</span>
+                    </div>
+                    <Check
+                      className={cn(
+                        "ml-auto h-4 w-4",
+                        selectedTagIds.includes(tag.id) ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            )}
           </Command>
         </PopoverContent>
       </Popover>
