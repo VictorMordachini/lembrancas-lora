@@ -36,14 +36,7 @@ const PublicFeed = () => {
     try {
       const { data, error } = await supabase
         .from('memories')
-        .select(`
-          *,
-          profiles!inner (
-            username,
-            full_name,
-            avatar_url
-          )
-        `)
+        .select('*')
         .eq('is_public', true)
         .order('created_at', { ascending: false })
         .limit(20);
@@ -176,7 +169,6 @@ const PublicFeed = () => {
                       key={memory.id}
                       memory={memory}
                       showPublicBadge={true}
-                      showAuthor={true}
                     />
                   ))}
                 </div>
