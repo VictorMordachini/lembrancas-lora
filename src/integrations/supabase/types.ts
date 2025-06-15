@@ -112,7 +112,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      delete_memory_with_cleanup: {
+        Args: { memory_id_param: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never

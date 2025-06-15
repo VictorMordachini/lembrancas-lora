@@ -170,7 +170,7 @@ const MemoryDetail = () => {
           <CardHeader>
             <MemoryHeader 
               memory={memory}
-              isOwner={isOwner}
+              isOwner={!!isOwner}
               onToggleFavorite={toggleFavorite}
             />
           </CardHeader>
