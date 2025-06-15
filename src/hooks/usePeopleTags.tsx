@@ -11,7 +11,6 @@ interface PeopleTag {
   created_at: string;
   updated_at: string;
   user_id: string;
-  is_shared: boolean;
 }
 
 export const usePeopleTags = () => {
@@ -30,6 +29,7 @@ export const usePeopleTags = () => {
       const { data, error } = await supabase
         .from('people_tags')
         .select('*')
+        .eq('user_id', user.id)
         .order('name', { ascending: true });
 
       if (error) throw error;
@@ -51,8 +51,7 @@ export const usePeopleTags = () => {
         .insert({
           name: name.trim(),
           avatar_url: avatarUrl || null,
-          user_id: user.id,
-          is_shared: isShared
+          user_id: user.id
         })
         .select()
         .single();
@@ -72,7 +71,7 @@ export const usePeopleTags = () => {
     }
   };
 
-  const updateTag = async (tagId: string, name: string, avatarUrl?: string, isShared?: boolean) => {
+  const updateTag = async (tagId: string, name: string, avatarUrl?: string) => {
     if (!user) return false;
 
     try {
@@ -80,8 +79,7 @@ export const usePeopleTags = () => {
         .from('people_tags')
         .update({
           name: name.trim(),
-          avatar_url: avatarUrl || null,
-          is_shared: isShared
+          avatar_url: avatarUrl || null
         })
         .eq('id', tagId)
         .eq('user_id', user.id)

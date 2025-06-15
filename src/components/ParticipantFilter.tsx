@@ -24,9 +24,7 @@ export const ParticipantFilter = ({
   const { tags, loading } = usePeopleTags();
   const [open, setOpen] = useState(false);
 
-  // Ensure tags is always an array and is ready for rendering
   const safeTags = Array.isArray(tags) ? tags : [];
-  const isDataReady = !loading && Array.isArray(tags);
   const selectedTag = safeTags.find(tag => tag.id === selectedParticipantId);
 
   const getTagInitials = (name: string) => {
@@ -77,48 +75,39 @@ export const ParticipantFilter = ({
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-80 p-0">
-          {isDataReady ? (
-            <Command>
-              <CommandInput placeholder="Buscar pessoa..." />
-              <CommandEmpty>Nenhuma pessoa encontrada.</CommandEmpty>
-              <CommandGroup>
-                {safeTags.map((tag) => (
-                  <CommandItem
-                    key={tag.id}
-                    value={tag.name}
-                    onSelect={() => {
-                      onParticipantSelect(tag.id);
-                      setOpen(false);
-                    }}
-                    className="flex items-center gap-3"
-                  >
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={tag.avatar_url || ''} alt={tag.name} />
-                      <AvatarFallback className="text-xs bg-slate-100 text-slate-600">
-                        {getTagInitials(tag.name)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <span>{tag.name}</span>
-                      {tag.is_shared && (
-                        <span className="text-xs text-blue-600 ml-2">(Compartilhada)</span>
-                      )}
-                    </div>
-                    <Check
-                      className={cn(
-                        "ml-auto h-4 w-4",
-                        selectedParticipantId === tag.id ? "opacity-100" : "opacity-0"
-                      )}
-                    />
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </Command>
-          ) : (
-            <div className="p-4 text-center text-sm text-gray-500">
-              Carregando pessoas...
-            </div>
-          )}
+          <Command>
+            <CommandInput placeholder="Buscar pessoa..." />
+            <CommandEmpty>Nenhuma pessoa encontrada.</CommandEmpty>
+            <CommandGroup>
+              {safeTags.map((tag) => (
+                <CommandItem
+                  key={tag.id}
+                  value={tag.name}
+                  onSelect={() => {
+                    onParticipantSelect(tag.id);
+                    setOpen(false);
+                  }}
+                  className="flex items-center gap-3"
+                >
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={tag.avatar_url || ''} alt={tag.name} />
+                    <AvatarFallback className="text-xs bg-slate-100 text-slate-600">
+                      {getTagInitials(tag.name)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <span>{tag.name}</span>
+                  </div>
+                  <Check
+                    className={cn(
+                      "ml-auto h-4 w-4",
+                      selectedParticipantId === tag.id ? "opacity-100" : "opacity-0"
+                    )}
+                  />
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </Command>
         </PopoverContent>
       </Popover>
     </div>

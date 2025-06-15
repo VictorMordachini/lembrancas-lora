@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,7 +10,6 @@ import Favorites from "./pages/Favorites";
 import Memories from "./pages/Memories";
 import MemoryDetail from "./pages/MemoryDetail";
 import NotFound from "./pages/NotFound";
-import ParticipantProfile from '@/pages/ParticipantProfile';
 
 const queryClient = new QueryClient();
 
@@ -27,7 +27,6 @@ function App() {
               <Route path="/memory/:id" element={<MemoryDetail />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/favorites" element={<Favorites />} />
-              <Route path="/participant/:participantId" element={<ParticipantProfile />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
