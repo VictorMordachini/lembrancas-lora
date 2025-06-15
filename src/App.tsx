@@ -23,14 +23,10 @@ const App = () => (
         <Routes>
           <Route path="/auth" element={<Auth />} />
           <Route path="/" element={<Index />} />
+          <Route path="/memory/:id" element={<MemoryDetail />} />
           <Route path="/memories" element={
             <AuthGuard>
               <Memories />
-            </AuthGuard>
-          } />
-          <Route path="/memory/:id" element={
-            <AuthGuard>
-              <MemoryDetail />
             </AuthGuard>
           } />
           <Route path="/favorites" element={

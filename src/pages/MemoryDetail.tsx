@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { ArrowLeft, User } from 'lucide-react';
+import { ArrowLeft, User, LogIn } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
@@ -60,7 +60,7 @@ const MemoryDetail = () => {
       if (memoryError) {
         console.error('Error fetching memory:', memoryError);
         if (memoryError.code === 'PGRST116') {
-          setError('Memória não encontrada ou você não tem permissão para visualizá-la');
+          setError('Memória não encontrada');
         } else {
           throw memoryError;
         }
@@ -68,6 +68,14 @@ const MemoryDetail = () => {
       }
 
       console.log('Memory data fetched:', memoryData);
+      
+      // Check if memory is public or if user is the owner
+      if (!memoryData.is_public && (!user || memoryData.user_id !== user.id)) {
+        setError('Esta memória é privada e você não tem permissão para visualizá-la');
+        setLoading(false);
+        return;
+      }
+
       setMemory(memoryData);
 
       // Fetch memory images
@@ -149,15 +157,32 @@ const MemoryDetail = () => {
             {error || 'Memória não encontrada'}
           </h3>
           <p className="text-slate-500 mb-8">
-            A memória que você está procurando não existe ou você não tem permissão para visualizá-la.
+            {error === 'Esta memória é privada e você não tem permissão para visualizá-la' ? (
+              <>
+                Esta memória é privada. {!user && 'Faça login para acessar suas memórias privadas.'}
+              </>
+            ) : (
+              'A memória que você está procurando não existe.'
+            )}
           </p>
-          <Button 
-            onClick={() => navigate('/')} 
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Voltar ao início
-          </Button>
+          <div className="flex gap-3 justify-center">
+            <Button 
+              onClick={() => navigate('/')} 
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Voltar ao Feed
+            </Button>
+            {!user && error === 'Esta memória é privada e você não tem permissão para visualizá-la' && (
+              <Button 
+                onClick={() => navigate('/auth')} 
+                variant="outline"
+              >
+                <LogIn className="w-4 h-4 mr-2" />
+                Fazer Login
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     );
@@ -178,6 +203,16 @@ const MemoryDetail = () => {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Voltar
           </Button>
+          
+          {!user && (
+            <Button
+              onClick={() => navigate('/auth')}
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
+            >
+              <LogIn className="w-4 h-4 mr-2" />
+              Entrar
+            </Button>
+          )}
         </div>
       </header>
 
