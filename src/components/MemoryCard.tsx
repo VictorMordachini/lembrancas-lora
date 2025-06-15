@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Calendar, Music, Image, Clock, Star, Globe } from 'lucide-react';
 import { format, parseISO, isValid } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { useNavigate } from 'react-router-dom';
 
 interface Memory {
   id: string;
@@ -19,12 +20,14 @@ interface Memory {
 
 interface MemoryCardProps {
   memory: Memory;
-  onClick: () => void;
+  onClick?: () => void;
   onToggleFavorite?: (memoryId: string, currentFavoriteState: boolean) => void;
   showPublicBadge?: boolean;
 }
 
 export const MemoryCard = ({ memory, onClick, onToggleFavorite, showPublicBadge = false }: MemoryCardProps) => {
+  const navigate = useNavigate();
+
   const formatMemoryDate = (dateString: string) => {
     try {
       const date = parseISO(dateString);
@@ -54,10 +57,19 @@ export const MemoryCard = ({ memory, onClick, onToggleFavorite, showPublicBadge 
     }
   };
 
+  const handleCardClick = () => {
+    if (onClick) {
+      onClick();
+    } else {
+      // Default behavior: navigate to memory detail page
+      navigate(`/memory/${memory.id}`);
+    }
+  };
+
   return (
     <Card 
       className="group cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-2 bg-white border-slate-200 hover:border-slate-300 overflow-hidden relative"
-      onClick={onClick}
+      onClick={handleCardClick}
     >
       {/* Badges container */}
       <div className="absolute top-3 right-3 z-10 flex gap-2">

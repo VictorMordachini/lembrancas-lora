@@ -48,10 +48,6 @@ const PublicFeed = () => {
     fetchPublicMemories();
   }, []);
 
-  const handleMemoryClick = (memory: Memory) => {
-    console.log('Ver memória:', memory);
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Header */}
@@ -166,7 +162,6 @@ const PublicFeed = () => {
                     <MemoryCard
                       key={memory.id}
                       memory={memory}
-                      onClick={() => handleMemoryClick(memory)}
                       showPublicBadge={true}
                     />
                   ))}

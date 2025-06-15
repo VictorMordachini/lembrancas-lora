@@ -11,18 +11,6 @@ import { MemoriesGrid } from '@/components/memories/MemoriesGrid';
 import { useMemories } from '@/hooks/useMemories';
 import { toast } from 'sonner';
 
-interface Memory {
-  id: string;
-  title: string;
-  description: string | null;
-  memory_date: string;
-  music_url: string | null;
-  dump_image_url: string | null;
-  created_at: string;
-  is_favorite: boolean;
-  is_public: boolean;
-}
-
 const Memories = () => {
   const [showForm, setShowForm] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
@@ -32,10 +20,6 @@ const Memories = () => {
   const handleSignOut = async () => {
     await signOut();
     toast.success('Logout realizado com sucesso!');
-  };
-
-  const handleMemoryClick = (memory: Memory) => {
-    console.log('Ver memória:', memory);
   };
 
   const handleMemorySaved = () => {
@@ -77,7 +61,6 @@ const Memories = () => {
             ) : (
               <MemoriesGrid
                 memories={memories}
-                onMemoryClick={handleMemoryClick}
                 onToggleFavorite={toggleFavorite}
               />
             )}

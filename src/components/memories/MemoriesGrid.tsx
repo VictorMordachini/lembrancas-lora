@@ -15,11 +15,10 @@ interface Memory {
 
 interface MemoriesGridProps {
   memories: Memory[];
-  onMemoryClick: (memory: Memory) => void;
   onToggleFavorite: (memoryId: string, currentFavoriteState: boolean) => void;
 }
 
-export const MemoriesGrid = ({ memories, onMemoryClick, onToggleFavorite }: MemoriesGridProps) => {
+export const MemoriesGrid = ({ memories, onToggleFavorite }: MemoriesGridProps) => {
   return (
     <div className="space-y-8">
       <div className="text-center">
@@ -36,7 +35,6 @@ export const MemoriesGrid = ({ memories, onMemoryClick, onToggleFavorite }: Memo
           <MemoryCard
             key={memory.id}
             memory={memory}
-            onClick={() => onMemoryClick(memory)}
             onToggleFavorite={onToggleFavorite}
             showPublicBadge={true}
           />
