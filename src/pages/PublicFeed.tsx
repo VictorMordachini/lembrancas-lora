@@ -23,7 +23,7 @@ interface Memory {
     username: string;
     full_name: string | null;
     avatar_url: string | null;
-  };
+  } | null;
 }
 
 const PublicFeed = () => {
@@ -38,7 +38,7 @@ const PublicFeed = () => {
         .from('memories')
         .select(`
           *,
-          profiles (
+          profiles!inner (
             username,
             full_name,
             avatar_url

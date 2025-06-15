@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Heart } from 'lucide-react';
@@ -18,6 +19,12 @@ interface Memory {
   created_at: string;
   is_favorite: boolean;
   is_public: boolean;
+  user_id: string;
+  profiles?: {
+    username: string;
+    full_name: string | null;
+    avatar_url: string | null;
+  } | null;
 }
 
 const Favorites = () => {
@@ -30,7 +37,14 @@ const Favorites = () => {
     try {
       const { data, error } = await supabase
         .from('memories')
-        .select('*')
+        .select(`
+          *,
+          profiles!inner (
+            username,
+            full_name,
+            avatar_url
+          )
+        `)
         .eq('user_id', user?.id)
         .eq('is_favorite', true)
         .order('memory_date', { ascending: false });

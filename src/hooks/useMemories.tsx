@@ -19,7 +19,7 @@ interface Memory {
     username: string;
     full_name: string | null;
     avatar_url: string | null;
-  };
+  } | null;
 }
 
 export const useMemories = () => {
@@ -33,7 +33,7 @@ export const useMemories = () => {
         .from('memories')
         .select(`
           *,
-          profiles (
+          profiles!inner (
             username,
             full_name,
             avatar_url
