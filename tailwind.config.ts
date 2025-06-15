@@ -19,10 +19,6 @@ export default {
 			}
 		},
 		extend: {
-			fontFamily: {
-				'sans': ['Sniglet', 'Comic Neue', 'Quicksand', 'Nunito', 'system-ui', 'sans-serif'],
-				'sniglet': ['Sniglet', 'Comic Neue', 'Quicksand', 'Nunito', 'system-ui', 'sans-serif'],
-			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',

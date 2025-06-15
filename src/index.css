@@ -92,13 +92,7 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans;
-    font-weight: 800; /* ExtraBold weight for Sniglet */
-  }
-
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-sniglet text-foreground;
-    font-weight: 800; /* ExtraBold weight */
+    @apply bg-background text-foreground;
   }
 }
 
