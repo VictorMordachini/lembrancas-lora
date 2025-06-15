@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -33,17 +34,18 @@ export const MemoryOfTheDay = () => {
       const currentMonth = today.getMonth() + 1; // getMonth() returns 0-11
       const currentYear = today.getFullYear();
 
+      // Use PostgreSQL date functions instead of LIKE operator
       const { data, error } = await supabase
         .from('memories')
         .select('*')
         .eq('user_id', user.id)
         .neq('memory_date', format(today, 'yyyy-MM-dd')) // Exclude today's memories
-        .filter('memory_date', 'like', `%-${currentMonth.toString().padStart(2, '0')}-${currentDay.toString().padStart(2, '0')}`)
+        .filter('memory_date', 'not.eq', format(today, 'yyyy-MM-dd'))
         .order('memory_date', { ascending: false });
 
       if (error) throw error;
 
-      // Additional filtering to ensure exact day/month match (since LIKE might be imprecise)
+      // Filter memories that match the current day and month but different year
       const filteredMemories = data?.filter(memory => {
         const memoryDate = parseISO(memory.memory_date);
         if (!isValid(memoryDate)) return false;
