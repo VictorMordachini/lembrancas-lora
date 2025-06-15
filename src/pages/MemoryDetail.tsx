@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ArrowLeft, User } from 'lucide-react';
@@ -33,6 +33,7 @@ interface MemoryImage {
 const MemoryDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
   const [memory, setMemory] = useState<Memory | null>(null);
   const [memoryImages, setMemoryImages] = useState<MemoryImage[]>([]);
@@ -47,6 +48,8 @@ const MemoryDetail = () => {
     }
 
     try {
+      console.log('Fetching memory with ID:', id);
+      
       // Fetch memory details
       const { data: memoryData, error: memoryError } = await supabase
         .from('memories')
@@ -55,6 +58,7 @@ const MemoryDetail = () => {
         .single();
 
       if (memoryError) {
+        console.error('Error fetching memory:', memoryError);
         if (memoryError.code === 'PGRST116') {
           setError('Memória não encontrada ou você não tem permissão para visualizá-la');
         } else {
@@ -63,6 +67,7 @@ const MemoryDetail = () => {
         return;
       }
 
+      console.log('Memory data fetched:', memoryData);
       setMemory(memoryData);
 
       // Fetch memory images
@@ -74,7 +79,9 @@ const MemoryDetail = () => {
 
       if (imagesError) {
         console.error('Erro ao carregar imagens:', imagesError);
+        toast.error('Erro ao carregar imagens da memória');
       } else {
+        console.log('Memory images fetched:', imagesData);
         setMemoryImages(imagesData || []);
       }
     } catch (error: any) {
@@ -104,6 +111,16 @@ const MemoryDetail = () => {
       );
     } catch (error: any) {
       toast.error(`Erro ao atualizar favorito: ${error.message}`);
+    }
+  };
+
+  const handleBackNavigation = () => {
+    // Check if there's history to go back to
+    if (location.key !== 'default') {
+      navigate(-1);
+    } else {
+      // If no history (direct page access), go to home
+      navigate('/');
     }
   };
 
@@ -154,9 +171,9 @@ const MemoryDetail = () => {
       <header className="bg-white/80 backdrop-blur-sm shadow-sm border-b border-slate-200 sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <Button
-            onClick={() => navigate(-1)}
+            onClick={handleBackNavigation}
             variant="ghost"
-            className="hover:bg-slate-100"
+            className="hover:bg-slate-100 transition-colors"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Voltar
@@ -166,8 +183,8 @@ const MemoryDetail = () => {
 
       {/* Content */}
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Card className="overflow-hidden">
-          <CardHeader>
+        <Card className="overflow-hidden shadow-lg">
+          <CardHeader className="bg-gradient-to-r from-slate-50 to-blue-50">
             <MemoryHeader 
               memory={memory}
               isOwner={!!isOwner}
@@ -175,7 +192,7 @@ const MemoryDetail = () => {
             />
           </CardHeader>
 
-          <CardContent>
+          <CardContent className="p-6">
             <MemoryContent 
               memory={memory}
               memoryImages={memoryImages}

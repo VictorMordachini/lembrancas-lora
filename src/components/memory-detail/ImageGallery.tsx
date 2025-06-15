@@ -21,7 +21,14 @@ export const ImageGallery = ({ memoryTitle, dumpImageUrl, memoryImages }: ImageG
     ...memoryImages.map(img => ({ url: img.image_url, type: 'uploaded' as const, id: img.id }))
   ];
 
-  if (allImages.length === 0) return null;
+  if (allImages.length === 0) {
+    return (
+      <div className="bg-slate-50 rounded-lg p-8 text-center">
+        <ImageIcon className="w-12 h-12 mx-auto text-slate-400 mb-3" />
+        <p className="text-slate-500">Nenhuma imagem encontrada para esta memória</p>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -40,17 +47,19 @@ export const ImageGallery = ({ memoryTitle, dumpImageUrl, memoryImages }: ImageG
                 <ImageWithFallback
                   src={dumpImageUrl}
                   alt={`${memoryTitle} - Colagem`}
-                  className="aspect-video w-full rounded-lg"
+                  className="aspect-video w-full rounded-lg shadow-lg hover:shadow-xl transition-shadow"
                   onClick={() => {}}
                 />
               </div>
             </DialogTrigger>
-            <DialogContent className="max-w-4xl max-h-[90vh] p-0">
-              <ImageWithFallback
-                src={dumpImageUrl}
-                alt={`${memoryTitle} - Colagem`}
-                className="w-full h-full rounded-lg"
-              />
+            <DialogContent className="max-w-4xl max-h-[90vh] p-2">
+              <div className="w-full h-full">
+                <ImageWithFallback
+                  src={dumpImageUrl}
+                  alt={`${memoryTitle} - Colagem`}
+                  className="w-full h-auto max-h-[85vh] rounded-lg"
+                />
+              </div>
             </DialogContent>
           </Dialog>
         </div>
@@ -70,17 +79,19 @@ export const ImageGallery = ({ memoryTitle, dumpImageUrl, memoryImages }: ImageG
                     <ImageWithFallback
                       src={image.image_url}
                       alt={`${memoryTitle} - Imagem ${index + 1}`}
-                      className="aspect-square rounded-lg"
+                      className="aspect-square rounded-lg shadow-md hover:shadow-lg transition-shadow"
                       onClick={() => {}}
                     />
                   </div>
                 </DialogTrigger>
-                <DialogContent className="max-w-4xl max-h-[90vh] p-0">
-                  <ImageWithFallback
-                    src={image.image_url}
-                    alt={`${memoryTitle} - Imagem ${index + 1}`}
-                    className="w-full h-full rounded-lg"
-                  />
+                <DialogContent className="max-w-4xl max-h-[90vh] p-2">
+                  <div className="w-full h-full">
+                    <ImageWithFallback
+                      src={image.image_url}
+                      alt={`${memoryTitle} - Imagem ${index + 1}`}
+                      className="w-full h-auto max-h-[85vh] rounded-lg"
+                    />
+                  </div>
                 </DialogContent>
               </Dialog>
             ))}
