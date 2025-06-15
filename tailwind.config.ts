@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -18,6 +19,10 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				'sans': ['Sniglet', 'Comic Neue', 'Quicksand', 'Nunito', 'system-ui', 'sans-serif'],
+				'sniglet': ['Sniglet', 'Comic Neue', 'Quicksand', 'Nunito', 'system-ui', 'sans-serif'],
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -61,6 +66,19 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// Custom LightCoral color
+				coral: {
+					50: '#fef7f7',
+					100: '#fdecec',
+					200: '#fadcdc',
+					300: '#f6bfbf',
+					400: '#f08080',
+					500: '#f08080',
+					600: '#e24c4c',
+					700: '#c73e3e',
+					800: '#a53636',
+					900: '#8a3434',
 				}
 			},
 			borderRadius: {
