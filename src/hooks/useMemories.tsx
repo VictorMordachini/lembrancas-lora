@@ -15,6 +15,11 @@ interface Memory {
   is_favorite: boolean;
   is_public: boolean;
   user_id: string;
+  profiles?: {
+    username: string;
+    full_name: string | null;
+    avatar_url: string | null;
+  } | null;
 }
 
 export const useMemories = () => {
@@ -26,7 +31,14 @@ export const useMemories = () => {
     try {
       const { data, error } = await supabase
         .from('memories')
-        .select('*')
+        .select(`
+          *,
+          profiles!inner (
+            username,
+            full_name,
+            avatar_url
+          )
+        `)
         .eq('user_id', user?.id)
         .order('memory_date', { ascending: false });
 

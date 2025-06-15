@@ -7,8 +7,6 @@ import { Calendar, Music, Image, Clock, Star, Globe, Edit, User } from 'lucide-r
 import { format, parseISO, isValid } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useNavigate } from 'react-router-dom';
-import { PeopleBadges } from '@/components/PeopleBadges';
-import { useMemoryParticipants } from '@/hooks/useMemoryParticipants';
 
 interface Memory {
   id: string;
@@ -48,7 +46,6 @@ export const MemoryCard = ({
   showAuthor = false
 }: MemoryCardProps) => {
   const navigate = useNavigate();
-  const { participants } = useMemoryParticipants(memory.id);
 
   const formatMemoryDate = (dateString: string) => {
     try {
@@ -204,15 +201,6 @@ export const MemoryCard = ({
                 Criada em {formatCreatedDate(memory.created_at)}
               </span>
             </div>
-
-            {/* People badges */}
-            {participants && participants.length > 0 && (
-              <PeopleBadges 
-                participants={participants} 
-                maxDisplay={2}
-                size="sm"
-              />
-            )}
           </div>
           
           <div className="flex flex-wrap gap-2 pt-2">

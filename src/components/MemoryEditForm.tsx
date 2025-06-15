@@ -6,9 +6,7 @@ import { MemoryFormHeader } from '@/components/memory-form/MemoryFormHeader';
 import { BasicFields } from '@/components/memory-form/BasicFields';
 import { PrivacyControl } from '@/components/memory-form/PrivacyControl';
 import { MusicField } from '@/components/memory-form/MusicField';
-import { PeopleTagSelector } from '@/components/PeopleTagSelector';
 import { useMemoryEdit } from '@/hooks/useMemoryEdit';
-import { useMemoryParticipants } from '@/hooks/useMemoryParticipants';
 
 interface MemoryEditFormProps {
   memoryId: string;
@@ -18,7 +16,6 @@ interface MemoryEditFormProps {
 
 export const MemoryEditForm = ({ memoryId, onSave, onCancel }: MemoryEditFormProps) => {
   const { memory, memoryImages, loading, updating, updateMemory, removeImage } = useMemoryEdit(memoryId);
-  const { participants, setMemoryParticipants } = useMemoryParticipants(memoryId);
   
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -27,7 +24,6 @@ export const MemoryEditForm = ({ memoryId, onSave, onCancel }: MemoryEditFormPro
   const [isPublic, setIsPublic] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [newImages, setNewImages] = useState<File[]>([]);
-  const [selectedPeopleTagIds, setSelectedPeopleTagIds] = useState<string[]>([]);
 
   // Populate form when memory loads
   useEffect(() => {
@@ -40,13 +36,6 @@ export const MemoryEditForm = ({ memoryId, onSave, onCancel }: MemoryEditFormPro
       setIsFavorite(memory.is_favorite);
     }
   }, [memory]);
-
-  // Populate selected participants when they load
-  useEffect(() => {
-    if (participants) {
-      setSelectedPeopleTagIds(participants.map(p => p.people_tag_id));
-    }
-  }, [participants]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -65,9 +54,6 @@ export const MemoryEditForm = ({ memoryId, onSave, onCancel }: MemoryEditFormPro
     if (!title.trim() || !memoryDate) {
       return;
     }
-
-    // Update memory participants
-    await setMemoryParticipants(selectedPeopleTagIds);
 
     const success = await updateMemory(
       title,
@@ -130,11 +116,6 @@ export const MemoryEditForm = ({ memoryId, onSave, onCancel }: MemoryEditFormPro
             <PrivacyControl
               isPublic={isPublic}
               setIsPublic={setIsPublic}
-            />
-
-            <PeopleTagSelector
-              selectedTagIds={selectedPeopleTagIds}
-              onSelectionChange={setSelectedPeopleTagIds}
             />
 
             {/* Existing Images */}

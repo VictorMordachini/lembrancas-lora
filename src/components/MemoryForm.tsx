@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -8,7 +7,6 @@ import { BasicFields } from '@/components/memory-form/BasicFields';
 import { PrivacyControl } from '@/components/memory-form/PrivacyControl';
 import { ImageUpload } from '@/components/memory-form/ImageUpload';
 import { MusicField } from '@/components/memory-form/MusicField';
-import { PeopleTagSelector } from '@/components/PeopleTagSelector';
 import { useMemorySubmit } from '@/hooks/useMemorySubmit';
 
 interface MemoryFormProps {
@@ -23,7 +21,6 @@ export const MemoryForm = ({ onSave, onCancel }: MemoryFormProps) => {
   const [musicUrl, setMusicUrl] = useState('');
   const [images, setImages] = useState<File[]>([]);
   const [isPublic, setIsPublic] = useState(false);
-  const [selectedPeopleTagIds, setSelectedPeopleTagIds] = useState<string[]>([]);
   
   const { loading, submitMemory } = useMemorySubmit();
 
@@ -47,8 +44,7 @@ export const MemoryForm = ({ onSave, onCancel }: MemoryFormProps) => {
       memoryDate,
       musicUrl,
       images,
-      isPublic,
-      selectedPeopleTagIds
+      isPublic
     );
 
     if (success) {
@@ -74,11 +70,6 @@ export const MemoryForm = ({ onSave, onCancel }: MemoryFormProps) => {
             <PrivacyControl
               isPublic={isPublic}
               setIsPublic={setIsPublic}
-            />
-
-            <PeopleTagSelector
-              selectedTagIds={selectedPeopleTagIds}
-              onSelectionChange={setSelectedPeopleTagIds}
             />
 
             <ImageUpload

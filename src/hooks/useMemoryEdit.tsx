@@ -2,8 +2,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { useMemoryImages } from '@/hooks/useMemoryImages';
-import { useMemoryCollage } from '@/hooks/useMemoryCollage';
 import { toast } from 'sonner';
 
 interface Memory {
@@ -18,13 +16,18 @@ interface Memory {
   is_public: boolean;
 }
 
+interface MemoryImage {
+  id: string;
+  image_url: string;
+  memory_id: string;
+}
+
 export const useMemoryEdit = (memoryId: string) => {
   const [memory, setMemory] = useState<Memory | null>(null);
+  const [memoryImages, setMemoryImages] = useState<MemoryImage[]>([]);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const { user } = useAuth();
-  const { memoryImages, setMemoryImages, fetchMemoryImages, uploadNewImages, removeImage, addNewImagesToMemory } = useMemoryImages(memoryId);
-  const { createCollage } = useMemoryCollage();
 
   const fetchMemory = async () => {
     try {
@@ -37,11 +40,73 @@ export const useMemoryEdit = (memoryId: string) => {
       if (memoryError) throw memoryError;
       setMemory(memoryData);
 
-      await fetchMemoryImages();
+      const { data: imagesData, error: imagesError } = await supabase
+        .from('memory_images')
+        .select('*')
+        .eq('memory_id', memoryId);
+
+      if (imagesError) throw imagesError;
+      setMemoryImages(imagesData || []);
     } catch (error: any) {
       toast.error(`Erro ao carregar memória: ${error.message}`);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const uploadNewImages = async (newImages: File[]) => {
+    const uploadedUrls: string[] = [];
+    
+    for (const image of newImages) {
+      const fileExt = image.name.split('.').pop();
+      const fileName = `${memoryId}/${Date.now()}.${fileExt}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('memory-images')
+        .upload(fileName, image);
+
+      if (uploadError) {
+        console.error('Erro ao fazer upload da imagem:', uploadError);
+        continue;
+      }
+
+      const { data } = supabase.storage
+        .from('memory-images')
+        .getPublicUrl(fileName);
+
+      uploadedUrls.push(data.publicUrl);
+    }
+
+    return uploadedUrls;
+  };
+
+  const removeImage = async (imageId: string, imageUrl: string) => {
+    try {
+      // Delete from database
+      const { error: dbError } = await supabase
+        .from('memory_images')
+        .delete()
+        .eq('id', imageId);
+
+      if (dbError) throw dbError;
+
+      // Delete from storage
+      const fileName = imageUrl.split('/').pop();
+      if (fileName) {
+        const { error: storageError } = await supabase.storage
+          .from('memory-images')
+          .remove([`${memoryId}/${fileName}`]);
+
+        if (storageError) {
+          console.error('Erro ao deletar imagem do storage:', storageError);
+        }
+      }
+
+      // Update local state
+      setMemoryImages(prev => prev.filter(img => img.id !== imageId));
+      toast.success('Imagem removida com sucesso!');
+    } catch (error: any) {
+      toast.error(`Erro ao remover imagem: ${error.message}`);
     }
   };
 
@@ -66,7 +131,14 @@ export const useMemoryEdit = (memoryId: string) => {
         uploadedUrls = await uploadNewImages(newImages);
         
         // Add new images to database
-        await addNewImagesToMemory(uploadedUrls);
+        for (const url of uploadedUrls) {
+          await supabase
+            .from('memory_images')
+            .insert({
+              memory_id: memoryId,
+              image_url: url
+            });
+        }
       }
 
       // Create new collage if there are images
@@ -74,7 +146,24 @@ export const useMemoryEdit = (memoryId: string) => {
       const allImages = [...memoryImages.map(img => img.image_url), ...uploadedUrls];
       
       if (allImages.length > 0) {
-        finalDumpImageUrl = await createCollage(allImages, memoryId, title);
+        try {
+          const { data, error } = await supabase.functions.invoke('create-memory-collage', {
+            body: { 
+              imageUrls: allImages, 
+              memoryId, 
+              title 
+            }
+          });
+
+          if (!error && data?.collageUrl) {
+            finalDumpImageUrl = data.collageUrl;
+            toast.success('Colagem atualizada com sucesso!');
+          }
+        } catch (error) {
+          console.error('Erro ao criar colagem:', error);
+          // Use first image if collage creation fails
+          finalDumpImageUrl = allImages[0];
+        }
       }
 
       // Update memory using the database function
