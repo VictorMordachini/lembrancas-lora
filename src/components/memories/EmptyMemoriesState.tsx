@@ -25,7 +25,7 @@ export const EmptyMemoriesState = ({ onCreateFirst }: EmptyMemoriesStateProps) =
         </p>
         <Button 
           onClick={onCreateFirst} 
-          className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg transition-all duration-200 hover:shadow-xl hover:scale-105 px-8 py-3 text-lg"
+          className="shadow-lg transition-all duration-200 hover:shadow-xl hover:scale-105 px-8 py-3 text-lg"
           size="lg"
         >
           <Plus className="w-5 h-5 mr-2" />

@@ -1,4 +1,3 @@
-
 import { Button } from '@/components/ui/button';
 import { Plus, LogOut, User, Heart, Globe } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -29,7 +28,7 @@ export const MemoriesHeader = ({ onNewMemory, onShowProfile, onSignOut }: Memori
         <div className="flex items-center gap-2 sm:gap-3">
           <Button
             onClick={onNewMemory}
-            className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg transition-all duration-200 hover:shadow-xl hover:scale-105 px-4 sm:px-6"
+            className="shadow-lg transition-all duration-200 hover:shadow-xl hover:scale-105 px-4 sm:px-6"
             size="default"
           >
             <Plus className="w-4 h-4 mr-2" />

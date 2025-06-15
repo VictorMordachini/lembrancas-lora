@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -96,7 +95,7 @@ export const MemoryForm = ({ onSave, onCancel }: MemoryFormProps) => {
               </Button>
               <Button
                 type="submit"
-                className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                className="flex-1"
                 disabled={loading}
               >
                 {loading ? (
