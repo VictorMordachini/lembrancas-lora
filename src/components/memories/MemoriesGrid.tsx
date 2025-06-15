@@ -11,6 +11,12 @@ interface Memory {
   created_at: string;
   is_favorite: boolean;
   is_public: boolean;
+  user_id: string;
+  profiles?: {
+    username: string;
+    full_name: string | null;
+    avatar_url: string | null;
+  };
 }
 
 interface MemoriesGridProps {
@@ -19,6 +25,7 @@ interface MemoriesGridProps {
   onEdit?: (memoryId: string) => void;
   showPublicBadge?: boolean;
   showEditButton?: boolean;
+  showAuthor?: boolean;
 }
 
 export const MemoriesGrid = ({ 
@@ -26,7 +33,8 @@ export const MemoriesGrid = ({
   onToggleFavorite, 
   onEdit,
   showPublicBadge = false,
-  showEditButton = false 
+  showEditButton = false,
+  showAuthor = false
 }: MemoriesGridProps) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -38,6 +46,7 @@ export const MemoriesGrid = ({
           onEdit={onEdit}
           showPublicBadge={showPublicBadge}
           showEditButton={showEditButton}
+          showAuthor={showAuthor}
         />
       ))}
     </div>

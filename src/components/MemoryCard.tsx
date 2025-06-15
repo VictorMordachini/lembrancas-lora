@@ -2,7 +2,8 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Calendar, Music, Image, Clock, Star, Globe, Edit } from 'lucide-react';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Calendar, Music, Image, Clock, Star, Globe, Edit, User } from 'lucide-react';
 import { format, parseISO, isValid } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useNavigate } from 'react-router-dom';
@@ -17,6 +18,12 @@ interface Memory {
   created_at: string;
   is_favorite: boolean;
   is_public: boolean;
+  user_id: string;
+  profiles?: {
+    username: string;
+    full_name: string | null;
+    avatar_url: string | null;
+  };
 }
 
 interface MemoryCardProps {
@@ -26,6 +33,7 @@ interface MemoryCardProps {
   onEdit?: (memoryId: string) => void;
   showPublicBadge?: boolean;
   showEditButton?: boolean;
+  showAuthor?: boolean;
 }
 
 export const MemoryCard = ({ 
@@ -34,7 +42,8 @@ export const MemoryCard = ({
   onToggleFavorite, 
   onEdit,
   showPublicBadge = false,
-  showEditButton = false 
+  showEditButton = false,
+  showAuthor = false
 }: MemoryCardProps) => {
   const navigate = useNavigate();
 
@@ -81,6 +90,16 @@ export const MemoryCard = ({
       // Default behavior: navigate to memory detail page
       navigate(`/memory/${memory.id}`);
     }
+  };
+
+  const getAuthorDisplayName = () => {
+    if (!memory.profiles) return 'Usuário';
+    return memory.profiles.full_name || memory.profiles.username || 'Usuário';
+  };
+
+  const getAuthorInitials = () => {
+    const name = getAuthorDisplayName();
+    return name.split(' ').map(word => word[0]).join('').toUpperCase().slice(0, 2);
   };
 
   return (
@@ -134,6 +153,29 @@ export const MemoryCard = ({
       )}
       <CardContent className="p-5">
         <div className="space-y-4">
+          {/* Author info - shown at the top when enabled */}
+          {showAuthor && memory.profiles && (
+            <div className="flex items-center gap-3 pb-2 border-b border-slate-100">
+              <Avatar className="h-8 w-8">
+                <AvatarImage 
+                  src={memory.profiles.avatar_url || ''} 
+                  alt={getAuthorDisplayName()}
+                />
+                <AvatarFallback className="text-xs bg-slate-100 text-slate-600">
+                  {getAuthorInitials()}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-slate-700 truncate">
+                  {getAuthorDisplayName()}
+                </p>
+                <p className="text-xs text-slate-500">
+                  @{memory.profiles.username}
+                </p>
+              </div>
+            </div>
+          )}
+
           <div className="space-y-2">
             <h3 className="font-bold text-slate-800 text-lg leading-tight line-clamp-2 group-hover:text-blue-600 transition-colors">
               {memory.title}

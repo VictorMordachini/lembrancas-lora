@@ -18,6 +18,12 @@ interface Memory {
   created_at: string;
   is_favorite: boolean;
   is_public: boolean;
+  user_id: string;
+  profiles?: {
+    username: string;
+    full_name: string | null;
+    avatar_url: string | null;
+  };
 }
 
 const PublicFeed = () => {
@@ -30,7 +36,14 @@ const PublicFeed = () => {
     try {
       const { data, error } = await supabase
         .from('memories')
-        .select('*')
+        .select(`
+          *,
+          profiles (
+            username,
+            full_name,
+            avatar_url
+          )
+        `)
         .eq('is_public', true)
         .order('created_at', { ascending: false })
         .limit(20);
@@ -163,6 +176,7 @@ const PublicFeed = () => {
                       key={memory.id}
                       memory={memory}
                       showPublicBadge={true}
+                      showAuthor={true}
                     />
                   ))}
                 </div>
