@@ -24,8 +24,9 @@ export const ParticipantFilter = ({
   const { tags, loading } = usePeopleTags();
   const [open, setOpen] = useState(false);
 
-  // Ensure tags is always an array and component is stable
+  // Ensure tags is always an array and is ready for rendering
   const safeTags = Array.isArray(tags) ? tags : [];
+  const isDataReady = !loading && Array.isArray(tags);
   const selectedTag = safeTags.find(tag => tag.id === selectedParticipantId);
 
   const getTagInitials = (name: string) => {
@@ -76,8 +77,7 @@ export const ParticipantFilter = ({
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-80 p-0">
-          {/* Only render Command when we have stable data */}
-          {!loading && (
+          {isDataReady ? (
             <Command>
               <CommandInput placeholder="Buscar pessoa..." />
               <CommandEmpty>Nenhuma pessoa encontrada.</CommandEmpty>
@@ -114,8 +114,7 @@ export const ParticipantFilter = ({
                 ))}
               </CommandGroup>
             </Command>
-          )}
-          {loading && (
+          ) : (
             <div className="p-4 text-center text-sm text-gray-500">
               Carregando pessoas...
             </div>

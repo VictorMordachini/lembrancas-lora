@@ -27,8 +27,9 @@ export const PeopleTagSelector = ({
   const [newTagShared, setNewTagShared] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
 
-  // Ensure tags is always an array and component is stable
+  // Ensure tags is always an array and is ready for rendering
   const safeTags = Array.isArray(tags) ? tags : [];
+  const isDataReady = !loading && Array.isArray(tags);
   const selectedTags = safeTags.filter(tag => selectedTagIds.includes(tag.id));
   const availableTags = safeTags.filter(tag => !selectedTagIds.includes(tag.id));
 
@@ -117,8 +118,7 @@ export const PeopleTagSelector = ({
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-full p-0">
-          {/* Only render Command when we have stable data */}
-          {!loading && (
+          {isDataReady ? (
             <Command>
               <CommandInput placeholder="Buscar ou criar nova tag..." />
               <CommandEmpty>
@@ -192,8 +192,7 @@ export const PeopleTagSelector = ({
                 ))}
               </CommandGroup>
             </Command>
-          )}
-          {loading && (
+          ) : (
             <div className="p-4 text-center text-sm text-gray-500">
               Carregando tags...
             </div>
