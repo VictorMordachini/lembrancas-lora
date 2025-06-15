@@ -27,8 +27,8 @@ export const PeopleTagSelector = ({
   const [newTagShared, setNewTagShared] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
 
-  // Ensure tags is always an array
-  const safeTags = tags || [];
+  // Ensure tags is always an array and component is stable
+  const safeTags = Array.isArray(tags) ? tags : [];
   const selectedTags = safeTags.filter(tag => selectedTagIds.includes(tag.id));
   const availableTags = safeTags.filter(tag => !selectedTagIds.includes(tag.id));
 
@@ -117,79 +117,87 @@ export const PeopleTagSelector = ({
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-full p-0">
-          <Command>
-            <CommandInput placeholder="Buscar ou criar nova tag..." />
-            <CommandEmpty>
-              <div className="p-4 space-y-3">
-                <p className="text-sm text-gray-500">Nenhuma tag encontrada.</p>
-                <div className="space-y-2">
-                  <Input
-                    placeholder="Nome da nova tag"
-                    value={newTagName}
-                    onChange={(e) => setNewTagName(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        handleCreateNewTag();
-                      }
-                    }}
-                  />
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      id="new-tag-shared"
-                      checked={newTagShared}
-                      onChange={(e) => setNewTagShared(e.target.checked)}
-                      className="rounded border-gray-300"
+          {/* Only render Command when we have stable data */}
+          {!loading && (
+            <Command>
+              <CommandInput placeholder="Buscar ou criar nova tag..." />
+              <CommandEmpty>
+                <div className="p-4 space-y-3">
+                  <p className="text-sm text-gray-500">Nenhuma tag encontrada.</p>
+                  <div className="space-y-2">
+                    <Input
+                      placeholder="Nome da nova tag"
+                      value={newTagName}
+                      onChange={(e) => setNewTagName(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          handleCreateNewTag();
+                        }
+                      }}
                     />
-                    <label htmlFor="new-tag-shared" className="text-sm text-gray-700">
-                      Compartilhar com outros usuários
-                    </label>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="new-tag-shared"
+                        checked={newTagShared}
+                        onChange={(e) => setNewTagShared(e.target.checked)}
+                        className="rounded border-gray-300"
+                      />
+                      <label htmlFor="new-tag-shared" className="text-sm text-gray-700">
+                        Compartilhar com outros usuários
+                      </label>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleCreateNewTag}
+                      disabled={!newTagName.trim() || isCreating}
+                      className="w-full"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      {isCreating ? 'Criando...' : 'Criar nova tag'}
+                    </Button>
                   </div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={handleCreateNewTag}
-                    disabled={!newTagName.trim() || isCreating}
-                    className="w-full"
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    {isCreating ? 'Criando...' : 'Criar nova tag'}
-                  </Button>
                 </div>
-              </div>
-            </CommandEmpty>
-            <CommandGroup>
-              {availableTags.map((tag) => (
-                <CommandItem
-                  key={tag.id}
-                  value={tag.name}
-                  onSelect={() => handleTagSelect(tag.id)}
-                  className="flex items-center gap-3"
-                >
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={tag.avatar_url || ''} alt={tag.name} />
-                    <AvatarFallback className="text-xs bg-slate-100 text-slate-600">
-                      {getTagInitials(tag.name)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <span>{tag.name}</span>
-                    {tag.is_shared && (
-                      <Share className="inline w-3 h-3 ml-2 text-blue-600" />
-                    )}
-                  </div>
-                  <Check
-                    className={cn(
-                      "ml-auto h-4 w-4",
-                      selectedTagIds.includes(tag.id) ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </Command>
+              </CommandEmpty>
+              <CommandGroup>
+                {availableTags.map((tag) => (
+                  <CommandItem
+                    key={tag.id}
+                    value={tag.name}
+                    onSelect={() => handleTagSelect(tag.id)}
+                    className="flex items-center gap-3"
+                  >
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={tag.avatar_url || ''} alt={tag.name} />
+                      <AvatarFallback className="text-xs bg-slate-100 text-slate-600">
+                        {getTagInitials(tag.name)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <span>{tag.name}</span>
+                      {tag.is_shared && (
+                        <Share className="inline w-3 h-3 ml-2 text-blue-600" />
+                      )}
+                    </div>
+                    <Check
+                      className={cn(
+                        "ml-auto h-4 w-4",
+                        selectedTagIds.includes(tag.id) ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </Command>
+          )}
+          {loading && (
+            <div className="p-4 text-center text-sm text-gray-500">
+              Carregando tags...
+            </div>
+          )}
         </PopoverContent>
       </Popover>
     </div>
