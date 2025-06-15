@@ -54,13 +54,34 @@ export const useMemorySubmit = () => {
     }
   };
 
+  const addParticipantsToMemory = async (memoryId: string, peopleTagIds: string[]) => {
+    if (peopleTagIds.length === 0) return;
+
+    try {
+      const { error } = await supabase
+        .from('memory_participants')
+        .insert(
+          peopleTagIds.map(tagId => ({
+            memory_id: memoryId,
+            people_tag_id: tagId
+          }))
+        );
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('Erro ao adicionar participantes:', error);
+      toast.warning('Memória criada, mas houve erro ao adicionar alguns participantes');
+    }
+  };
+
   const submitMemory = async (
     title: string,
     description: string,
     memoryDate: string,
     musicUrl: string,
     images: File[],
-    isPublic: boolean
+    isPublic: boolean,
+    peopleTagIds: string[] = []
   ) => {
     if (!title.trim() || !memoryDate) {
       toast.error('Por favor, preencha pelo menos o título e a data da memória.');
@@ -129,6 +150,11 @@ export const useMemorySubmit = () => {
           .from('memories')
           .update({ dump_image_url: finalDumpImageUrl })
           .eq('id', memory.id);
+      }
+
+      // 4. Adicionar participantes à memória
+      if (peopleTagIds.length > 0) {
+        await addParticipantsToMemory(memory.id, peopleTagIds);
       }
 
       return true;
