@@ -22,11 +22,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/auth" element={<Auth />} />
-          <Route path="/" element={
-            <AuthGuard>
-              <Index />
-            </AuthGuard>
-          } />
+          <Route path="/" element={<Index />} />
           <Route path="/memories" element={
             <AuthGuard>
               <Memories />
