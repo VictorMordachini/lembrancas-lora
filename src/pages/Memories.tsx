@@ -1,77 +1,86 @@
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { MemoryForm } from '@/components/MemoryForm';
-import { ProfileDialog } from '@/components/ProfileDialog';
-import { MemoriesSkeleton } from '@/components/MemoriesSkeleton';
-import { MemoryOfTheDay } from '@/components/MemoryOfTheDay';
-import { MemoriesHeader } from '@/components/memories/MemoriesHeader';
-import { EmptyMemoriesState } from '@/components/memories/EmptyMemoriesState';
-import { MemoriesGrid } from '@/components/memories/MemoriesGrid';
 import { useMemories } from '@/hooks/useMemories';
-import { toast } from 'sonner';
+import { MemoriesHeader } from '@/components/memories/MemoriesHeader';
+import { MemoriesGrid } from '@/components/memories/MemoriesGrid';
+import { EmptyMemoriesState } from '@/components/memories/EmptyMemoriesState';
+import { MemoriesSkeleton } from '@/components/MemoriesSkeleton';
+import { MemoryForm } from '@/components/MemoryForm';
+import { MemoryEditForm } from '@/components/MemoryEditForm';
 
 const Memories = () => {
   const [showForm, setShowForm] = useState(false);
-  const [showProfile, setShowProfile] = useState(false);
-  const { signOut } = useAuth();
+  const [editingMemoryId, setEditingMemoryId] = useState<string | null>(null);
+  const { user, loading: authLoading } = useAuth();
   const { memories, loading, fetchMemories, toggleFavorite } = useMemories();
+  const navigate = useNavigate();
 
-  const handleSignOut = async () => {
-    await signOut();
-    toast.success('Logout realizado com sucesso!');
+  if (authLoading) {
+    return <MemoriesSkeleton />;
+  }
+
+  if (!user) {
+    navigate('/auth');
+    return null;
+  }
+
+  const handleCreateFirst = () => {
+    setShowForm(true);
   };
 
-  const handleMemorySaved = () => {
+  const handleSave = () => {
     setShowForm(false);
+    setEditingMemoryId(null);
     fetchMemories();
-    toast.success('Memória criada com sucesso!');
+  };
+
+  const handleCancel = () => {
+    setShowForm(false);
+    setEditingMemoryId(null);
+  };
+
+  const handleEdit = (memoryId: string) => {
+    setEditingMemoryId(memoryId);
+    setShowForm(false);
   };
 
   if (showForm) {
+    return <MemoryForm onSave={handleSave} onCancel={handleCancel} />;
+  }
+
+  if (editingMemoryId) {
     return (
-      <div className="min-h-screen bg-background p-4">
-        <div className="max-w-4xl mx-auto pt-8">
-          <MemoryForm
-            onSave={handleMemorySaved}
-            onCancel={() => setShowForm(false)}
-          />
-        </div>
-      </div>
+      <MemoryEditForm 
+        memoryId={editingMemoryId}
+        onSave={handleSave} 
+        onCancel={handleCancel} 
+      />
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <MemoriesHeader
-        onNewMemory={() => setShowForm(true)}
-        onShowProfile={() => setShowProfile(true)}
-        onSignOut={handleSignOut}
-      />
-
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <div className="container mx-auto px-4 py-8">
+        <MemoriesHeader 
+          onCreateMemory={() => setShowForm(true)}
+          memoriesCount={memories.length}
+        />
+        
         {loading ? (
           <MemoriesSkeleton />
+        ) : memories.length === 0 ? (
+          <EmptyMemoriesState onCreateFirst={handleCreateFirst} />
         ) : (
-          <>
-            <MemoryOfTheDay />
-            
-            {memories.length === 0 ? (
-              <EmptyMemoriesState onCreateFirst={() => setShowForm(true)} />
-            ) : (
-              <MemoriesGrid
-                memories={memories}
-                onToggleFavorite={toggleFavorite}
-              />
-            )}
-          </>
+          <MemoriesGrid 
+            memories={memories} 
+            onToggleFavorite={toggleFavorite}
+            onEdit={handleEdit}
+            showEditButton={true}
+          />
         )}
-      </main>
-
-      <ProfileDialog 
-        open={showProfile} 
-        onOpenChange={setShowProfile} 
-      />
+      </div>
     </div>
   );
 };

@@ -1,29 +1,27 @@
 
-import { Button } from '@/components/ui/button';
 import { CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { X } from 'lucide-react';
 
 interface MemoryFormHeaderProps {
   onCancel: () => void;
+  title?: string;
 }
 
-export const MemoryFormHeader = ({ onCancel }: MemoryFormHeaderProps) => {
+export const MemoryFormHeader = ({ onCancel, title = "Criar Nova Memória" }: MemoryFormHeaderProps) => {
   return (
-    <CardHeader>
-      <div className="flex items-center gap-4">
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          onClick={onCancel}
-          className="hover:bg-slate-100"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </Button>
-        <CardTitle className="text-2xl font-bold text-slate-800">
-          Nova Memória
-        </CardTitle>
-      </div>
+    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 border-b">
+      <CardTitle className="text-2xl font-bold text-gray-800">
+        {title}
+      </CardTitle>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={onCancel}
+        className="h-8 w-8 p-0 hover:bg-gray-100"
+      >
+        <X className="h-4 w-4" />
+      </Button>
     </CardHeader>
   );
 };

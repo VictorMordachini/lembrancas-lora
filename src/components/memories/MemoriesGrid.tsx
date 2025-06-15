@@ -15,31 +15,31 @@ interface Memory {
 
 interface MemoriesGridProps {
   memories: Memory[];
-  onToggleFavorite: (memoryId: string, currentFavoriteState: boolean) => void;
+  onToggleFavorite?: (memoryId: string, currentFavoriteState: boolean) => void;
+  onEdit?: (memoryId: string) => void;
+  showPublicBadge?: boolean;
+  showEditButton?: boolean;
 }
 
-export const MemoriesGrid = ({ memories, onToggleFavorite }: MemoriesGridProps) => {
+export const MemoriesGrid = ({ 
+  memories, 
+  onToggleFavorite, 
+  onEdit,
+  showPublicBadge = false,
+  showEditButton = false 
+}: MemoriesGridProps) => {
   return (
-    <div className="space-y-8">
-      <div className="text-center">
-        <h2 className="text-3xl font-bold text-slate-800 mb-2">
-          Suas Memórias
-        </h2>
-        <p className="text-slate-600">
-          {memories.length} memória{memories.length !== 1 ? 's' : ''} guardada{memories.length !== 1 ? 's' : ''}
-        </p>
-      </div>
-      
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {memories.map((memory) => (
-          <MemoryCard
-            key={memory.id}
-            memory={memory}
-            onToggleFavorite={onToggleFavorite}
-            showPublicBadge={true}
-          />
-        ))}
-      </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {memories.map((memory) => (
+        <MemoryCard
+          key={memory.id}
+          memory={memory}
+          onToggleFavorite={onToggleFavorite}
+          onEdit={onEdit}
+          showPublicBadge={showPublicBadge}
+          showEditButton={showEditButton}
+        />
+      ))}
     </div>
   );
 };

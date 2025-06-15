@@ -116,6 +116,19 @@ export type Database = {
         Args: { memory_id_param: string }
         Returns: boolean
       }
+      update_memory_with_images: {
+        Args: {
+          memory_id_param: string
+          title_param: string
+          description_param: string
+          memory_date_param: string
+          music_url_param: string
+          is_public_param: boolean
+          is_favorite_param: boolean
+          dump_image_url_param?: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never

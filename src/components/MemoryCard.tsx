@@ -1,7 +1,8 @@
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Music, Image, Clock, Star, Globe } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Calendar, Music, Image, Clock, Star, Globe, Edit } from 'lucide-react';
 import { format, parseISO, isValid } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useNavigate } from 'react-router-dom';
@@ -22,10 +23,19 @@ interface MemoryCardProps {
   memory: Memory;
   onClick?: () => void;
   onToggleFavorite?: (memoryId: string, currentFavoriteState: boolean) => void;
+  onEdit?: (memoryId: string) => void;
   showPublicBadge?: boolean;
+  showEditButton?: boolean;
 }
 
-export const MemoryCard = ({ memory, onClick, onToggleFavorite, showPublicBadge = false }: MemoryCardProps) => {
+export const MemoryCard = ({ 
+  memory, 
+  onClick, 
+  onToggleFavorite, 
+  onEdit,
+  showPublicBadge = false,
+  showEditButton = false 
+}: MemoryCardProps) => {
   const navigate = useNavigate();
 
   const formatMemoryDate = (dateString: string) => {
@@ -57,6 +67,13 @@ export const MemoryCard = ({ memory, onClick, onToggleFavorite, showPublicBadge 
     }
   };
 
+  const handleEditClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onEdit) {
+      onEdit(memory.id);
+    }
+  };
+
   const handleCardClick = () => {
     if (onClick) {
       onClick();
@@ -77,6 +94,16 @@ export const MemoryCard = ({ memory, onClick, onToggleFavorite, showPublicBadge 
           <div className="p-2 rounded-full bg-green-100 backdrop-blur-sm shadow-lg">
             <Globe className="w-4 h-4 text-green-600" />
           </div>
+        )}
+        
+        {/* Edit Button */}
+        {showEditButton && onEdit && (
+          <button
+            onClick={handleEditClick}
+            className="p-2 rounded-full bg-blue-100 backdrop-blur-sm shadow-lg hover:bg-blue-200 transition-all duration-200 hover:scale-110"
+          >
+            <Edit className="w-4 h-4 text-blue-600" />
+          </button>
         )}
         
         {/* Favorite Star */}
