@@ -24,7 +24,9 @@ export const ParticipantFilter = ({
   const { tags, loading } = usePeopleTags();
   const [open, setOpen] = useState(false);
 
-  const selectedTag = tags.find(tag => tag.id === selectedParticipantId);
+  // Ensure tags is always an array
+  const safeTags = tags || [];
+  const selectedTag = safeTags.find(tag => tag.id === selectedParticipantId);
 
   const getTagInitials = (name: string) => {
     return name.split(' ').map(word => word[0]).join('').toUpperCase().slice(0, 2);
@@ -78,7 +80,7 @@ export const ParticipantFilter = ({
             <CommandInput placeholder="Buscar pessoa..." />
             <CommandEmpty>Nenhuma pessoa encontrada.</CommandEmpty>
             <CommandGroup>
-              {tags.map((tag) => (
+              {safeTags.map((tag) => (
                 <CommandItem
                   key={tag.id}
                   value={tag.name}

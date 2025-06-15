@@ -27,8 +27,10 @@ export const PeopleTagSelector = ({
   const [newTagShared, setNewTagShared] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
 
-  const selectedTags = tags.filter(tag => selectedTagIds.includes(tag.id));
-  const availableTags = tags.filter(tag => !selectedTagIds.includes(tag.id));
+  // Ensure tags is always an array
+  const safeTags = tags || [];
+  const selectedTags = safeTags.filter(tag => selectedTagIds.includes(tag.id));
+  const availableTags = safeTags.filter(tag => !selectedTagIds.includes(tag.id));
 
   const handleTagSelect = (tagId: string) => {
     onSelectionChange([...selectedTagIds, tagId]);

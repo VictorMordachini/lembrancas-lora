@@ -20,7 +20,11 @@ export const usePeopleTags = () => {
   const { user } = useAuth();
 
   const fetchTags = async () => {
-    if (!user) return;
+    if (!user) {
+      setTags([]);
+      setLoading(false);
+      return;
+    }
 
     try {
       const { data, error } = await supabase
@@ -32,6 +36,7 @@ export const usePeopleTags = () => {
       setTags(data || []);
     } catch (error: any) {
       toast.error(`Erro ao carregar tags de pessoas: ${error.message}`);
+      setTags([]);
     } finally {
       setLoading(false);
     }
@@ -125,6 +130,9 @@ export const usePeopleTags = () => {
   useEffect(() => {
     if (user) {
       fetchTags();
+    } else {
+      setTags([]);
+      setLoading(false);
     }
   }, [user]);
 
