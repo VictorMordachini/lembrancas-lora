@@ -9,7 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ArrowLeft } from 'lucide-react';
 
 const Auth = () => {
   const [email, setEmail] = useState('');
@@ -58,6 +58,18 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center p-4">
+      {/* Botão de voltar */}
+      <div className="absolute top-4 left-4">
+        <Button
+          onClick={() => navigate('/')}
+          variant="outline"
+          className="hover:bg-slate-100 transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Voltar ao Feed
+        </Button>
+      </div>
+
       <Card className="w-full max-w-md shadow-xl border-slate-200">
         <CardHeader className="space-y-4 text-center pb-8">
           <div className="flex justify-center mb-2">
