@@ -20,11 +20,6 @@ interface Memory {
   is_favorite: boolean;
   is_public: boolean;
   user_id: string;
-  profiles?: {
-    username: string;
-    full_name: string | null;
-    avatar_url: string | null;
-  } | null;
 }
 
 const Favorites = () => {
@@ -37,14 +32,7 @@ const Favorites = () => {
     try {
       const { data, error } = await supabase
         .from('memories')
-        .select(`
-          *,
-          profiles!inner (
-            username,
-            full_name,
-            avatar_url
-          )
-        `)
+        .select('*')
         .eq('user_id', user?.id)
         .eq('is_favorite', true)
         .order('memory_date', { ascending: false });
