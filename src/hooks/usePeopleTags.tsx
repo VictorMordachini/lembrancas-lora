@@ -33,8 +33,11 @@ export const usePeopleTags = () => {
         .order('name', { ascending: true });
 
       if (error) throw error;
-      setTags(data || []);
+      
+      // Ensure we always set an array, even if data is null
+      setTags(Array.isArray(data) ? data : []);
     } catch (error: any) {
+      console.error('Error fetching people tags:', error);
       toast.error(`Erro ao carregar tags de pessoas: ${error.message}`);
       setTags([]);
     } finally {
@@ -42,7 +45,7 @@ export const usePeopleTags = () => {
     }
   };
 
-  const createTag = async (name: string, avatarUrl?: string, isShared: boolean = false) => {
+  const createTag = async (name: string, avatarUrl?: string) => {
     if (!user) return null;
 
     try {
@@ -58,10 +61,15 @@ export const usePeopleTags = () => {
 
       if (error) throw error;
 
-      setTags(prev => [...prev, data].sort((a, b) => a.name.localeCompare(b.name)));
+      setTags(prev => {
+        const updatedTags = [...prev, data];
+        return updatedTags.sort((a, b) => a.name.localeCompare(b.name));
+      });
+      
       toast.success(`Tag "${name}" criada com sucesso!`);
       return data;
     } catch (error: any) {
+      console.error('Error creating tag:', error);
       if (error.code === '23505') {
         toast.error(`Você já tem uma tag com o nome "${name}"`);
       } else {
@@ -88,13 +96,17 @@ export const usePeopleTags = () => {
 
       if (error) throw error;
 
-      setTags(prev => prev.map(tag => 
-        tag.id === tagId ? data : tag
-      ).sort((a, b) => a.name.localeCompare(b.name)));
+      setTags(prev => {
+        const updatedTags = prev.map(tag => 
+          tag.id === tagId ? data : tag
+        );
+        return updatedTags.sort((a, b) => a.name.localeCompare(b.name));
+      });
 
       toast.success(`Tag atualizada com sucesso!`);
       return true;
     } catch (error: any) {
+      console.error('Error updating tag:', error);
       if (error.code === '23505') {
         toast.error(`Você já tem uma tag com o nome "${name}"`);
       } else {
@@ -120,6 +132,7 @@ export const usePeopleTags = () => {
       toast.success('Tag removida com sucesso!');
       return true;
     } catch (error: any) {
+      console.error('Error deleting tag:', error);
       toast.error(`Erro ao remover tag: ${error.message}`);
       return false;
     }

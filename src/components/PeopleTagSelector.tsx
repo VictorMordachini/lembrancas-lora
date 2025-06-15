@@ -26,17 +26,20 @@ export const PeopleTagSelector = ({
   const [newTagName, setNewTagName] = useState('');
   const [isCreating, setIsCreating] = useState(false);
 
+  // Ensure tags is always an array and selectedTagIds is always an array
   const safeTags = Array.isArray(tags) ? tags : [];
-  const selectedTags = safeTags.filter(tag => selectedTagIds.includes(tag.id));
-  const availableTags = safeTags.filter(tag => !selectedTagIds.includes(tag.id));
+  const safeSelectedTagIds = Array.isArray(selectedTagIds) ? selectedTagIds : [];
+  
+  const selectedTags = safeTags.filter(tag => safeSelectedTagIds.includes(tag.id));
+  const availableTags = safeTags.filter(tag => !safeSelectedTagIds.includes(tag.id));
 
   const handleTagSelect = (tagId: string) => {
-    onSelectionChange([...selectedTagIds, tagId]);
+    onSelectionChange([...safeSelectedTagIds, tagId]);
     setOpen(false);
   };
 
   const handleTagRemove = (tagId: string) => {
-    onSelectionChange(selectedTagIds.filter(id => id !== tagId));
+    onSelectionChange(safeSelectedTagIds.filter(id => id !== tagId));
   };
 
   const handleCreateNewTag = async () => {
@@ -46,7 +49,7 @@ export const PeopleTagSelector = ({
     const newTag = await createTag(newTagName, undefined);
     
     if (newTag) {
-      onSelectionChange([...selectedTagIds, newTag.id]);
+      onSelectionChange([...safeSelectedTagIds, newTag.id]);
       setNewTagName('');
       setOpen(false);
     }
@@ -163,7 +166,7 @@ export const PeopleTagSelector = ({
                     <Check
                       className={cn(
                         "ml-auto h-4 w-4",
-                        selectedTagIds.includes(tag.id) ? "opacity-100" : "opacity-0"
+                        safeSelectedTagIds.includes(tag.id) ? "opacity-100" : "opacity-0"
                       )}
                     />
                   </CommandItem>

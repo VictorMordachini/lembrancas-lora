@@ -24,6 +24,7 @@ export const ParticipantFilter = ({
   const { tags, loading } = usePeopleTags();
   const [open, setOpen] = useState(false);
 
+  // Ensure tags is always an array and not undefined
   const safeTags = Array.isArray(tags) ? tags : [];
   const selectedTag = safeTags.find(tag => tag.id === selectedParticipantId);
 
@@ -36,7 +37,7 @@ export const ParticipantFilter = ({
   }
 
   // Don't render if no tags available
-  if (!safeTags.length) {
+  if (safeTags.length === 0) {
     return null;
   }
 
