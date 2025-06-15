@@ -119,6 +119,13 @@ export type Database = {
             foreignKeyName: "memory_participants_people_tag_id_fkey"
             columns: ["people_tag_id"]
             isOneToOne: false
+            referencedRelation: "participant_memory_stats"
+            referencedColumns: ["people_tag_id"]
+          },
+          {
+            foreignKeyName: "memory_participants_people_tag_id_fkey"
+            columns: ["people_tag_id"]
+            isOneToOne: false
             referencedRelation: "people_tags"
             referencedColumns: ["id"]
           },
@@ -129,6 +136,7 @@ export type Database = {
           avatar_url: string | null
           created_at: string
           id: string
+          is_shared: boolean
           name: string
           updated_at: string
           user_id: string
@@ -137,6 +145,7 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           id?: string
+          is_shared?: boolean
           name: string
           updated_at?: string
           user_id: string
@@ -145,6 +154,7 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           id?: string
+          is_shared?: boolean
           name?: string
           updated_at?: string
           user_id?: string
@@ -188,7 +198,26 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      participant_memory_stats: {
+        Row: {
+          avatar_url: string | null
+          is_shared: boolean | null
+          name: string | null
+          people_tag_id: string | null
+          public_memories: number | null
+          tag_owner_id: string | null
+          total_memories: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "people_tags_user_id_fkey"
+            columns: ["tag_owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       delete_memory_with_cleanup: {

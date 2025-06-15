@@ -1,12 +1,14 @@
 
+import { useNavigate } from 'react-router-dom';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { User } from 'lucide-react';
+import { User, Share } from 'lucide-react';
 
 interface PeopleTag {
   id: string;
   name: string;
   avatar_url: string | null;
+  is_shared?: boolean;
 }
 
 interface MemoryParticipant {
@@ -19,14 +21,18 @@ interface PeopleBadgesProps {
   maxDisplay?: number;
   size?: 'sm' | 'md' | 'lg';
   className?: string;
+  clickable?: boolean;
 }
 
 export const PeopleBadges = ({ 
   participants, 
   maxDisplay = 3, 
   size = 'md',
-  className = '' 
+  className = '',
+  clickable = true
 }: PeopleBadgesProps) => {
+  const navigate = useNavigate();
+
   if (!participants || participants.length === 0) {
     return null;
   }
@@ -44,6 +50,12 @@ export const PeopleBadges = ({
     lg: 'h-10 w-10 text-base'
   };
 
+  const handleParticipantClick = (participantId: string) => {
+    if (clickable) {
+      navigate(`/participant/${participantId}`);
+    }
+  };
+
   return (
     <div className={`flex items-center gap-2 ${className}`}>
       <div className="flex items-center gap-1">
@@ -56,7 +68,10 @@ export const PeopleBadges = ({
           <Badge
             key={participant.id}
             variant="secondary"
-            className="flex items-center gap-2 pl-1"
+            className={`flex items-center gap-2 pl-1 ${
+              clickable ? 'cursor-pointer hover:bg-gray-200 transition-colors' : ''
+            }`}
+            onClick={() => handleParticipantClick(participant.people_tags.id)}
           >
             <Avatar className={sizeClasses[size]}>
               <AvatarImage 
@@ -68,6 +83,9 @@ export const PeopleBadges = ({
               </AvatarFallback>
             </Avatar>
             <span>{participant.people_tags.name}</span>
+            {participant.people_tags.is_shared && (
+              <Share className="w-3 h-3 text-blue-600" />
+            )}
           </Badge>
         ))}
         

@@ -6,7 +6,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Check, ChevronsUpDown, Plus, X, User } from 'lucide-react';
+import { Check, ChevronsUpDown, Plus, X, User, Share } from 'lucide-react';
 import { usePeopleTags } from '@/hooks/usePeopleTags';
 import { cn } from '@/lib/utils';
 
@@ -24,6 +24,7 @@ export const PeopleTagSelector = ({
   const { tags, loading, createTag } = usePeopleTags();
   const [open, setOpen] = useState(false);
   const [newTagName, setNewTagName] = useState('');
+  const [newTagShared, setNewTagShared] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
 
   const selectedTags = tags.filter(tag => selectedTagIds.includes(tag.id));
@@ -42,11 +43,12 @@ export const PeopleTagSelector = ({
     if (!newTagName.trim()) return;
 
     setIsCreating(true);
-    const newTag = await createTag(newTagName);
+    const newTag = await createTag(newTagName, undefined, newTagShared);
     
     if (newTag) {
       onSelectionChange([...selectedTagIds, newTag.id]);
       setNewTagName('');
+      setNewTagShared(false);
       setOpen(false);
     }
     setIsCreating(false);
@@ -78,6 +80,9 @@ export const PeopleTagSelector = ({
                 </AvatarFallback>
               </Avatar>
               <span className="text-sm">{tag.name}</span>
+              {tag.is_shared && (
+                <Share className="h-3 w-3 text-blue-600" />
+              )}
               <Button
                 type="button"
                 variant="ghost"
@@ -127,6 +132,18 @@ export const PeopleTagSelector = ({
                       }
                     }}
                   />
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id="new-tag-shared"
+                      checked={newTagShared}
+                      onChange={(e) => setNewTagShared(e.target.checked)}
+                      className="rounded border-gray-300"
+                    />
+                    <label htmlFor="new-tag-shared" className="text-sm text-gray-700">
+                      Compartilhar com outros usuários
+                    </label>
+                  </div>
                   <Button
                     type="button"
                     variant="outline"
@@ -155,7 +172,12 @@ export const PeopleTagSelector = ({
                       {getTagInitials(tag.name)}
                     </AvatarFallback>
                   </Avatar>
-                  <span>{tag.name}</span>
+                  <div className="flex-1">
+                    <span>{tag.name}</span>
+                    {tag.is_shared && (
+                      <Share className="inline w-3 h-3 ml-2 text-blue-600" />
+                    )}
+                  </div>
                   <Check
                     className={cn(
                       "ml-auto h-4 w-4",
