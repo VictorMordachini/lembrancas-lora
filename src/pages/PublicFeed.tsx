@@ -1,12 +1,13 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { LogIn, User, Heart, BookOpen } from 'lucide-react';
+import { LogIn, User, Heart, BookOpen, LogOut } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { MemoryCard } from '@/components/MemoryCard';
 import { MemoriesSkeleton } from '@/components/MemoriesSkeleton';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { toast } from 'sonner';
 
 interface Memory {
   id: string;
@@ -30,7 +31,7 @@ const PublicFeed = () => {
   const [memories, setMemories] = useState<Memory[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
 
   const fetchPublicMemories = async () => {
     try {
@@ -47,6 +48,15 @@ const PublicFeed = () => {
       console.error('Erro ao carregar memórias públicas:', error.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSignOut = async () => {
+    const { error } = await signOut();
+    if (error) {
+      toast.error('Erro ao sair: ' + error.message);
+    } else {
+      toast.success('Logout realizado com sucesso!');
     }
   };
 
@@ -72,7 +82,7 @@ const PublicFeed = () => {
           </div>
           <div className="flex items-center gap-2 sm:gap-3">
             {user ? (
-              // Usuário logado - mostrar navegação para suas seções
+              // Usuário logado - mostrar navegação para suas seções e logout
               <>
                 <Button
                   onClick={() => navigate('/memories')}
@@ -89,6 +99,14 @@ const PublicFeed = () => {
                   className="hover:bg-slate-100 transition-colors"
                 >
                   <Heart className="w-4 h-4 text-red-500" />
+                </Button>
+                <Button
+                  onClick={handleSignOut}
+                  variant="outline"
+                  className="hover:bg-slate-100 transition-colors"
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  <span className="hidden sm:inline">Sair</span>
                 </Button>
               </>
             ) : (
