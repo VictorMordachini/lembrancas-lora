@@ -2,7 +2,7 @@
 
 Guarde e compartilhe seus momentos mais especiais. Uma plataforma completa para registrar suas memórias.
 
-**[🔗 Acesse a aplicação ao vivo!](URL_DA_SUA_APLICACAO_AQUI)**
+**[🔗 Acesse a aplicação ao vivo!]((https://lembrancas-lora.vercel.app/))**
 
 ---
 
