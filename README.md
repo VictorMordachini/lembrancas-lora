@@ -1,4 +1,4 @@
-# Erinnerungen Lora  Erinnerungen
+# Lembranças Lora
 
 Guarde e compartilhe seus momentos mais especiais. Uma plataforma completa para registrar suas memórias.
 
